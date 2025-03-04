@@ -5,7 +5,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
-import { GraphQLExceptionFilter } from './graphql-exception.filter';
 
 @Module({
   imports: [
@@ -19,19 +18,12 @@ import { GraphQLExceptionFilter } from './graphql-exception.filter';
         transport: Transport.GRPC,
         options: {
           package: 'user',
-          protoPath: join(__dirname, '../../proto/user.proto'),
+          protoPath: join(__dirname, '../../../proto/user.proto'),
           url: 'localhost:50051',
         },
       },
     ]),
   ],
-  providers: [
-    UserResolver,
-    UserService,
-    {
-      provide: 'APP_FILTER',
-      useClass: GraphQLExceptionFilter,
-    },
-  ],
+  providers: [UserResolver, UserService],
 })
 export class UserModule {}

@@ -2,14 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Device {
-  _id: ID!
-  deviceId: String!
-  ipAddress: String!
-  userAgent: String!
-  location: String
-}
-
 type User {
   _id: ID!
   firstName: String!
@@ -21,7 +13,6 @@ type User {
   mfaEnabled: Boolean!
   isVerified: Boolean!
   isDeleted: Boolean!
-  devices: [Device!]
   createdAt: String
   updatedAt: String
 }
@@ -33,8 +24,6 @@ type Query {
 
 type Mutation {
   createUser(input: CreateUserInput!): User!
-  updateUser(input: UpdateUserInput!): User!
-  deleteUser(id: String!): Boolean!
 }
 
 input CreateUserInput {
@@ -44,18 +33,4 @@ input CreateUserInput {
   password: String!
   role: String!
   school: String!
-}
-
-input UpdateUserInput {
-  id: ID!
-  firstName: String
-  lastName: String
-  email: String
-  password: String
-  role: String
-  school: String
-  isActive: Boolean
-  mfaEnabled: Boolean
-  isVerified: Boolean
-  refreshToken: String
 }

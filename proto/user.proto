@@ -6,23 +6,80 @@ service UserService {
   rpc CreateUser (CreateUserRequest) returns (User) {}
   rpc FindAllUsers (Empty) returns (UsersResponse) {}
   rpc FindUser (FindUserRequest) returns (User) {}
+  rpc UpdateUser (UpdateUserRequest) returns (User) {}
+  rpc DeleteUser (DeleteUserRequest) returns (Empty) {}
 }
 
 message Empty {}
 
 message CreateUserRequest {
-  string name = 1;
-  string email = 2;
+  string firstName = 1;
+  string lastName = 2;
+  string email = 3;
+  string password = 4;
+  string role = 5;
+  string school = 6;
 }
 
 message FindUserRequest {
   string id = 1;
 }
 
+message UpdateUserRequest {
+  string id = 1;
+  optional string firstName = 2;
+  optional string lastName = 3;
+  optional string email = 4;
+  optional string password = 5;
+  optional string role = 6;
+  optional string school = 7;
+  optional bool isActive = 8;
+  optional bool mfaEnabled = 9;
+  optional bool isVerified = 10;
+  optional string refreshToken = 11;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message Device {
+  string id = 1;
+  string deviceId = 2;
+  string ipAddress = 3;
+  string userAgent = 4;
+  optional string location = 5; // Optional field
+  string createdAt = 6;
+  string updatedAt = 7;
+}
+
 message User {
   string id = 1;
-  string name = 2;
-  string email = 3;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+  string role = 5;
+  string school = 6;
+  bool isActive = 7;
+  optional string lastActive = 8; // Added
+  bool mfaEnabled = 9;
+  optional string mfaSecret = 10; // Added
+  repeated Device devices = 11; // Added as array
+  repeated string notifications = 12; // Added as array
+  optional string lastPasswordChanged = 13; // Added
+  optional string resetPasswordToken = 14; // Added
+  optional string resetPasswordExpires = 15; // Added
+  bool isVerified = 16;
+  optional string verificationOTP = 17; // Added
+  optional string verificationOtpExpires = 18; // Added
+  optional string verificationToken = 19; // Added
+  bool isDeleted = 20;
+  optional string otpRequestedAt = 21; // Added
+  int32 otpRequestCount = 22; // Added (default 0 in schema)
+  optional string otpBlockedUntil = 23; // Added
+  string createdAt = 24;
+  string updatedAt = 25;
+  optional string refreshToken = 26; // Added
 }
 
 message UsersResponse {
