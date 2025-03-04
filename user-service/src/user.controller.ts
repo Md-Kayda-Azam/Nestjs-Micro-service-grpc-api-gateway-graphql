@@ -3,7 +3,7 @@ import { GrpcMethod } from '@nestjs/microservices';
 import { UserService } from './user.service';
 import { RpcException } from '@nestjs/microservices';
 import * as grpc from '@grpc/grpc-js';
-import { CreateUserDto, UpdateUserDto } from './types/UserTypes';
+import { CreateUserDto, UpdateUserDto, VerifyUserDto } from './types/UserTypes';
 
 @Controller()
 export class UserController {
@@ -70,6 +70,19 @@ export class UserController {
       throw new RpcException({
         code: grpc.status.INTERNAL,
         message: 'Failed to delete user',
+      });
+    }
+  }
+
+  @GrpcMethod('UserService', 'VerifyUser') // নতুন মেথড যোগ করা হলো
+  async verifyUser(data: VerifyUserDto) {
+    try {
+      return await this.userService.verifyUser(data);
+    } catch (error) {
+      if (error instanceof RpcException) throw error;
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
+        message: 'Failed to verify user',
       });
     }
   }

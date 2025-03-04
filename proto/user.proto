@@ -8,6 +8,7 @@ service UserService {
   rpc FindUser (FindUserRequest) returns (User) {}
   rpc UpdateUser (UpdateUserRequest) returns (User) {}
   rpc DeleteUser (DeleteUserRequest) returns (Empty) {}
+  rpc VerifyUser (VerifyUserRequest) returns (User) {}
 }
 
 message Empty {}
@@ -41,6 +42,11 @@ message UpdateUserRequest {
 
 message DeleteUserRequest {
   string id = 1;
+}
+
+message VerifyUserRequest {
+  string token = 1;
+  string password = 2;
 }
 
 message Device {

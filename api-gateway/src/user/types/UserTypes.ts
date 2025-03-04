@@ -36,7 +36,6 @@ export interface UserGrpcService {
     firstName: string;
     lastName: string;
     email: string;
-    password: string;
     role: string;
     school: string;
   }): Observable<GrpcUserResponse>;
@@ -47,7 +46,6 @@ export interface UserGrpcService {
     firstName?: string;
     lastName?: string;
     email?: string;
-    password?: string;
     role?: string;
     school?: string;
     isActive?: boolean;
@@ -55,5 +53,9 @@ export interface UserGrpcService {
     isVerified?: boolean;
     refreshToken?: string;
   }): Observable<GrpcUserResponse>;
-  DeleteUser(data: { id: string }): Observable<void>; // Still returns void as per proto
+  DeleteUser(data: { id: string }): Observable<void>;
+  VerifyUser(data: {
+    token: string;
+    password: string;
+  }): Observable<GrpcUserResponse>;
 }

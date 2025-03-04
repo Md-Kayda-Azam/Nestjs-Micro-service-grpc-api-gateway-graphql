@@ -4,6 +4,7 @@ import { GraphQLError } from 'graphql';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input'; // New DTO for update
 import { UserService } from './user.service';
+import { VerifyUserInput } from './dto/verify-user.input';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -93,6 +94,26 @@ export class UserResolver {
         extensions: {
           code:
             error.message === 'User not found'
+              ? 'NOT_FOUND'
+              : 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
+  }
+
+  @Mutation(() => User)
+  async verifyUser(
+    @Args('input', { type: () => VerifyUserInput })
+    input: VerifyUserInput,
+  ): Promise<User> {
+    try {
+      const user = await this.userService.verifyUser(input); // gRPC কল
+      return user;
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code:
+            error.message === 'Invalid or expired verification token'
               ? 'NOT_FOUND'
               : 'INTERNAL_SERVER_ERROR',
         },

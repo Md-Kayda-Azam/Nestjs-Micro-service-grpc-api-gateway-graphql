@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input'; // New DTO for update
 import { UserGrpcService } from './types/UserTypes';
+import { VerifyUserInput } from './dto/verify-user.input';
 
 @Injectable()
 export class UserService {
@@ -114,6 +115,27 @@ export class UserService {
       await lastValueFrom(this.userGrpcService.DeleteUser({ id }));
     } catch (error) {
       throw new Error(error.details || 'Failed to delete user');
+    }
+  }
+
+  async verifyUser(data: VerifyUserInput): Promise<User> {
+    try {
+      const user = await lastValueFrom(this.userGrpcService.VerifyUser(data));
+      return {
+        _id: user.id, // Map id to _id
+        ...user,
+        devices: user.devices?.map((device) => ({
+          _id: device.id,
+          deviceId: device.deviceId,
+          ipAddress: device.ipAddress,
+          userAgent: device.userAgent,
+          location: device.location,
+          createdAt: device.createdAt,
+          updatedAt: device.updatedAt,
+        })),
+      };
+    } catch (error) {
+      throw new Error(error.details || 'Failed to verify user');
     }
   }
 }

@@ -35,13 +35,13 @@ type Mutation {
   createUser(input: CreateUserInput!): User!
   updateUser(input: UpdateUserInput!): User!
   deleteUser(id: String!): Boolean!
+  verifyUser(input: VerifyUserInput!): User!
 }
 
 input CreateUserInput {
   firstName: String!
   lastName: String!
   email: String!
-  password: String!
   role: String!
   school: String!
 }
@@ -58,4 +58,9 @@ input UpdateUserInput {
   mfaEnabled: Boolean
   isVerified: Boolean
   refreshToken: String
+}
+
+input VerifyUserInput {
+  token: String!
+  password: String!
 }
