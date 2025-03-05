@@ -2,18 +2,18 @@ import { NestFactory } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import * as dotenv from 'dotenv';
-import { UserModule } from './user.module';
+import { AuthModule } from './auth.module';
 
 // Load environment variables from .env file
 dotenv.config();
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice(UserModule, {
+  const app = await NestFactory.createMicroservice(AuthModule, {
     transport: Transport.GRPC,
     options: {
       package: 'user',
-      protoPath: join(__dirname, '../../proto/user.proto'),
-      url: 'localhost:50051', // User Service চলবে পোর্ট 50051-এ
+      protoPath: join(__dirname, '../../proto/auth.proto'),
+      url: 'localhost:50052',
     },
   });
   await app.listen();

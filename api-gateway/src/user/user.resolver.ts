@@ -10,6 +10,10 @@ import { VerifyUserInput } from './dto/verify-user.input';
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
+  /**
+   * Find All Users
+   * @returns
+   */
   @Query(() => [User], { name: 'users' })
   async findAll(): Promise<User[]> {
     try {
@@ -24,12 +28,9 @@ export class UserResolver {
   }
 
   @Query(() => User, { name: 'user' })
-  async findOne(@Args('id') id: string): Promise<User> {
+  async findOne(@Args('email') email: string): Promise<User> {
     try {
-      const user = await this.userService.findUser(id);
-      if (!user._id) {
-        throw new Error('User ID is missing in the response');
-      }
+      const user = await this.userService.findUser(email);
       return user;
     } catch (error) {
       throw new GraphQLError(error.message, {
@@ -94,26 +95,6 @@ export class UserResolver {
         extensions: {
           code:
             error.message === 'User not found'
-              ? 'NOT_FOUND'
-              : 'INTERNAL_SERVER_ERROR',
-        },
-      });
-    }
-  }
-
-  @Mutation(() => User)
-  async verifyUser(
-    @Args('input', { type: () => VerifyUserInput })
-    input: VerifyUserInput,
-  ): Promise<User> {
-    try {
-      const user = await this.userService.verifyUser(input); // gRPC কল
-      return user;
-    } catch (error) {
-      throw new GraphQLError(error.message, {
-        extensions: {
-          code:
-            error.message === 'Invalid or expired verification token'
               ? 'NOT_FOUND'
               : 'INTERNAL_SERVER_ERROR',
         },

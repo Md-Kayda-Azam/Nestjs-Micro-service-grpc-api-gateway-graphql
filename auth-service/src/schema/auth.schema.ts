@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type UserDocument = User & Document;
+export type AuthDocument = Auth & Document;
 
 @Schema({ timestamps: true })
-export class User {
+export class Auth {
   _id: string;
 
   @Prop({ required: true })
@@ -105,7 +105,7 @@ export class User {
   updatedAt?: Date;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const AuthSchema = SchemaFactory.createForClass(Auth);
 
 export interface Device {
   _id: string;

@@ -8,6 +8,8 @@ type Device {
   ipAddress: String!
   userAgent: String!
   location: String
+  createdAt: String
+  updatedAt: String
 }
 
 type User {
@@ -18,24 +20,38 @@ type User {
   role: String!
   school: String!
   isActive: Boolean!
+  lastActive: String
   mfaEnabled: Boolean!
-  isVerified: Boolean!
-  isDeleted: Boolean!
+  mfaSecret: String
   devices: [Device!]
+  notifications: [String!]
+  lastPasswordChanged: String
+  resetPasswordToken: String
+  resetPasswordExpires: String
+  resetRequestedAt: String
+  resetRequestCount: Float
+  resetBlockedUntil: String
+  isVerified: Boolean!
+  verificationToken: String
+  verificationTokenExpires: String
+  verificationRequestedAt: String
+  verificationRequestCount: Float
+  verificationBlockedUntil: String
+  isDeleted: Boolean!
+  refreshToken: String
   createdAt: String
   updatedAt: String
 }
 
 type Query {
   users: [User!]!
-  user(id: String!): User!
+  user(email: String!): User!
 }
 
 type Mutation {
   createUser(input: CreateUserInput!): User!
   updateUser(input: UpdateUserInput!): User!
   deleteUser(id: String!): Boolean!
-  verifyUser(input: VerifyUserInput!): User!
 }
 
 input CreateUserInput {
@@ -58,9 +74,4 @@ input UpdateUserInput {
   mfaEnabled: Boolean
   isVerified: Boolean
   refreshToken: String
-}
-
-input VerifyUserInput {
-  token: String!
-  password: String!
 }

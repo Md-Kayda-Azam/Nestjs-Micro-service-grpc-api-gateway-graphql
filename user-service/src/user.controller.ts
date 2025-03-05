@@ -3,16 +3,27 @@ import { GrpcMethod } from '@nestjs/microservices';
 import { UserService } from './user.service';
 import { RpcException } from '@nestjs/microservices';
 import * as grpc from '@grpc/grpc-js';
-import { CreateUserDto, UpdateUserDto, VerifyUserDto } from './types/UserTypes';
+import {
+  CreateUserData,
+  Device,
+  UpdateUserData,
+  UserResponse,
+} from './types/UserTypes';
 
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  /**
+   * Create User
+   * @param data
+   * @returns
+   */
   @GrpcMethod('UserService', 'CreateUser')
-  async createUser(data: CreateUserDto) {
+  async createUser(data: CreateUserData): Promise<UserResponse> {
     try {
-      return await this.userService.createUser(data);
+      const user = await this.userService.createUser(data);
+      return user;
     } catch (error) {
       if (error instanceof RpcException) throw error;
       throw new RpcException({
@@ -22,10 +33,16 @@ export class UserController {
     }
   }
 
+  /**
+   * Get All Users
+   * @param data
+   * @returns
+   */
   @GrpcMethod('UserService', 'FindAllUsers')
-  async findAllUsers(data: {}) {
+  async findAllUsers(data: {}): Promise<{ users: UserResponse[] }> {
     try {
-      return await this.userService.findAllUsers();
+      const users = await this.userService.findAllUsers();
+      return users;
     } catch (error) {
       throw new RpcException({
         code: grpc.status.INTERNAL,
@@ -34,25 +51,45 @@ export class UserController {
     }
   }
 
-  @GrpcMethod('UserService', 'FindUser')
-  async findUser(data: { id: string }) {
+  /**
+   * Get Single User
+   * @param data
+   * @returns
+   */
+  @GrpcMethod('UserService', 'GetUserByEmail')
+  async getUserByEmail(data: { email: string }): Promise<UserResponse> {
     try {
-      return await this.userService.findUser(data.id);
+      return await this.userService.getUserByEmail(data.email);
     } catch (error) {
-      if (error instanceof RpcException) throw error;
       throw new RpcException({
         code: grpc.status.INTERNAL,
-        message: 'Failed to fetch user',
+        message: 'Failed to fetch user by email',
       });
     }
   }
 
+  @GrpcMethod('UserService', 'GetUserDevices')
+  async getUserDevices(data: { id: string }): Promise<{ devices: Device[] }> {
+    try {
+      return await this.userService.getUserDevices(data.id);
+    } catch (error) {
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
+        message: 'Failed to fetch user devices',
+      });
+    }
+  }
+
+  /**
+   * Update User
+   * @param data
+   * @returns
+   */
   @GrpcMethod('UserService', 'UpdateUser')
-  async updateUser(data: UpdateUserDto) {
+  async updateUser(data: UpdateUserData): Promise<UserResponse> {
     try {
       return await this.userService.updateUser(data);
     } catch (error) {
-      if (error instanceof RpcException) throw error;
       throw new RpcException({
         code: grpc.status.INTERNAL,
         message: 'Failed to update user',
@@ -60,29 +97,19 @@ export class UserController {
     }
   }
 
+  /**
+   * Delete User
+   * @param data
+   * @returns
+   */
   @GrpcMethod('UserService', 'DeleteUser')
-  async deleteUser(data: { id: string }) {
+  async deleteUser(data: { id: string }): Promise<void> {
     try {
-      await this.userService.deleteUser(data.id);
-      return {}; // Return Empty message as per proto
+      return await this.userService.deleteUser(data.id);
     } catch (error) {
-      if (error instanceof RpcException) throw error;
       throw new RpcException({
         code: grpc.status.INTERNAL,
         message: 'Failed to delete user',
-      });
-    }
-  }
-
-  @GrpcMethod('UserService', 'VerifyUser') // নতুন মেথড যোগ করা হলো
-  async verifyUser(data: VerifyUserDto) {
-    try {
-      return await this.userService.verifyUser(data);
-    } catch (error) {
-      if (error instanceof RpcException) throw error;
-      throw new RpcException({
-        code: grpc.status.INTERNAL,
-        message: 'Failed to verify user',
       });
     }
   }

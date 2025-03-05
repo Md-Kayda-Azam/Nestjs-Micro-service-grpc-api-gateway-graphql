@@ -5,10 +5,10 @@ package user;
 service UserService {
   rpc CreateUser (CreateUserRequest) returns (User) {}
   rpc FindAllUsers (Empty) returns (UsersResponse) {}
-  rpc FindUser (FindUserRequest) returns (User) {}
+  rpc GetUserByEmail (GetUserByEmailRequest) returns (User) {}
+  rpc GetUserDevices (GetUserDevicesRequest) returns (UserDevicesResponse) {}
   rpc UpdateUser (UpdateUserRequest) returns (User) {}
   rpc DeleteUser (DeleteUserRequest) returns (Empty) {}
-  rpc VerifyUser (VerifyUserRequest) returns (User) {}
 }
 
 message Empty {}
@@ -17,12 +17,15 @@ message CreateUserRequest {
   string firstName = 1;
   string lastName = 2;
   string email = 3;
-  string password = 4;
-  string role = 5;
-  string school = 6;
+  string role = 4;
+  string school = 5;
 }
 
-message FindUserRequest {
+message GetUserByEmailRequest {
+  string email = 1;
+}
+
+message GetUserDevicesRequest {
   string id = 1;
 }
 
@@ -31,22 +34,32 @@ message UpdateUserRequest {
   optional string firstName = 2;
   optional string lastName = 3;
   optional string email = 4;
-  optional string password = 5;
-  optional string role = 6;
-  optional string school = 7;
-  optional bool isActive = 8;
+  optional string role = 5;
+  optional string school = 6;
+  optional bool isActive = 7;
+  optional string lastActive = 8;
   optional bool mfaEnabled = 9;
-  optional bool isVerified = 10;
-  optional string refreshToken = 11;
+  optional string mfaSecret = 10;
+  optional bool isVerified = 11;
+  optional string verificationToken = 12;
+  optional string verificationTokenExpires = 13;
+  optional string verificationRequestedAt = 14;
+  optional int32 verificationRequestCount = 15;
+  optional string verificationBlockedUntil = 16;
+  optional bool isDeleted = 17;
+  optional string refreshToken = 18;
+  optional string resetPasswordToken = 19;
+  optional string resetPasswordExpires = 20;
+  optional string resetRequestedAt = 21;
+  optional int32 resetRequestCount = 22;
+  optional string resetBlockedUntil = 23;
+  repeated Device devices = 24;
+  repeated string notifications = 25;
+  optional string lastPasswordChanged = 26;
 }
 
 message DeleteUserRequest {
   string id = 1;
-}
-
-message VerifyUserRequest {
-  string token = 1;
-  string password = 2;
 }
 
 message Device {
@@ -54,9 +67,9 @@ message Device {
   string deviceId = 2;
   string ipAddress = 3;
   string userAgent = 4;
-  optional string location = 5; // Optional field
-  string createdAt = 6;
-  string updatedAt = 7;
+  optional string location = 5;
+  optional string createdAt = 6;
+  optional string updatedAt = 7;
 }
 
 message User {
@@ -67,27 +80,33 @@ message User {
   string role = 5;
   string school = 6;
   bool isActive = 7;
-  optional string lastActive = 8; // Added
+  optional string lastActive = 8;
   bool mfaEnabled = 9;
-  optional string mfaSecret = 10; // Added
-  repeated Device devices = 11; // Added as array
-  repeated string notifications = 12; // Added as array
-  optional string lastPasswordChanged = 13; // Added
-  optional string resetPasswordToken = 14; // Added
-  optional string resetPasswordExpires = 15; // Added
-  bool isVerified = 16;
-  optional string verificationOTP = 17; // Added
-  optional string verificationOtpExpires = 18; // Added
-  optional string verificationToken = 19; // Added
-  bool isDeleted = 20;
-  optional string otpRequestedAt = 21; // Added
-  int32 otpRequestCount = 22; // Added (default 0 in schema)
-  optional string otpBlockedUntil = 23; // Added
-  string createdAt = 24;
-  string updatedAt = 25;
-  optional string refreshToken = 26; // Added
+  optional string mfaSecret = 10;
+  repeated Device devices = 11;
+  repeated string notifications = 12;
+  optional string lastPasswordChanged = 13;
+  optional string resetPasswordToken = 14;
+  optional string resetPasswordExpires = 15;
+  optional string resetRequestedAt = 16;
+  optional int32 resetRequestCount = 17;
+  optional string resetBlockedUntil = 18;
+  bool isVerified = 19;
+  optional string verificationToken = 20;
+  optional string verificationTokenExpires = 21;
+  optional string verificationRequestedAt = 22;
+  optional int32 verificationRequestCount = 23;
+  optional string verificationBlockedUntil = 24;
+  bool isDeleted = 25;
+  optional string refreshToken = 26;
+  optional string createdAt = 27;
+  optional string updatedAt = 28;
 }
 
 message UsersResponse {
   repeated User users = 1;
+}
+
+message UserDevicesResponse {
+  repeated Device devices = 1;
 }
