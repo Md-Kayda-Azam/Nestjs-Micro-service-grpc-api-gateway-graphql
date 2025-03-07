@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type AuthDocument = Auth & Document;
+export type UserDocument = User & Document;
 
 @Schema({ timestamps: true })
-export class Auth {
+export class User {
   _id: string;
 
   @Prop({ required: true })
@@ -40,7 +40,6 @@ export class Auth {
   @Prop({
     type: [
       {
-        _id: String,
         deviceId: String,
         ipAddress: String,
         userAgent: String,
@@ -96,7 +95,7 @@ export class Auth {
   isDeleted: boolean;
 
   @Prop({ type: String, default: null })
-  refreshToken?: string;
+  refreshToken?: string | null;
 
   @Prop()
   createdAt?: Date;
@@ -105,14 +104,11 @@ export class Auth {
   updatedAt?: Date;
 }
 
-export const AuthSchema = SchemaFactory.createForClass(Auth);
+export const UserSchema = SchemaFactory.createForClass(User);
 
 export interface Device {
-  _id: string;
   deviceId: string;
   ipAddress: string;
   userAgent: string;
   location?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
 }

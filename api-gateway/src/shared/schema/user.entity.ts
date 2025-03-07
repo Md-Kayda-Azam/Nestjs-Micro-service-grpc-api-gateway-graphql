@@ -34,7 +34,7 @@ export class User {
   mfaSecret?: string;
 
   @Field(() => [Device], { nullable: true })
-  devices?: Device[];
+  devices?: Device[] | undefined;
 
   @Field(() => [String], { nullable: true, defaultValue: [] })
   notifications?: string[];
@@ -80,6 +80,9 @@ export class User {
 
   @Field({ nullable: true })
   refreshToken?: string;
+
+  @Field({ nullable: true })
+  accessToken?: string;
 
   @Field({ nullable: true })
   createdAt?: string;

@@ -1,10 +1,9 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
-import { User } from './entities/user.entity';
 import { GraphQLError } from 'graphql';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input'; // New DTO for update
 import { UserService } from './user.service';
-import { VerifyUserInput } from './dto/verify-user.input';
+import { User } from 'src/shared/schema/user.entity';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -77,7 +76,7 @@ export class UserResolver {
           code:
             error.message === 'User not found'
               ? 'NOT_FOUND'
-              : error.message.includes('already exists')
+              : error.message.includes('Invalid Id')
                 ? 'ALREADY_EXISTS'
                 : 'INTERNAL_SERVER_ERROR',
         },

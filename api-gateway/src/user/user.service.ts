@@ -1,10 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input'; // New DTO for update
 import { UserGrpcService } from './types/UserTypes';
+import { User } from 'src/shared/schema/user.entity';
 
 @Injectable()
 export class UserService {
@@ -50,7 +50,6 @@ export class UserService {
   async findAllUsers(): Promise<User[]> {
     try {
       const result = await lastValueFrom(this.userGrpcService.FindAllUsers({}));
-      console.log(result, 'user service');
       if (result?.users && Array.isArray(result.users)) {
         return result.users.map((response) => ({
           _id: response.id, // Map id to _id
@@ -72,6 +71,11 @@ export class UserService {
     }
   }
 
+  /**
+   * Find User
+   * @param email
+   * @returns
+   */
   async findUser(email: string): Promise<User> {
     try {
       const response = await lastValueFrom(
@@ -100,6 +104,11 @@ export class UserService {
     }
   }
 
+  /**
+   * Update User
+   * @param data
+   * @returns
+   */
   async updateUser(data: UpdateUserInput): Promise<User> {
     try {
       const response = await lastValueFrom(
@@ -123,6 +132,10 @@ export class UserService {
     }
   }
 
+  /**
+   * Delete User
+   * @param id
+   */
   async deleteUser(id: string): Promise<void> {
     try {
       await lastValueFrom(this.userGrpcService.DeleteUser({ id }));

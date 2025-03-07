@@ -5,6 +5,7 @@ export interface VerifyAccountData {
 export interface LoginData {
   email: string;
   password: string;
+  userAgent: string;
 }
 
 export interface ResendVerificationData {

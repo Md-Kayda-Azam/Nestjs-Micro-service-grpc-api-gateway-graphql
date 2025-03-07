@@ -143,7 +143,6 @@ export const sendVerificationEmail = async (
     throw new Error(`Failed to send verification email: ${error.message}`);
   }
 };
-import * as nodemailer from 'nodemailer';
 
 export const sendResetEmail = async (
   email: string,

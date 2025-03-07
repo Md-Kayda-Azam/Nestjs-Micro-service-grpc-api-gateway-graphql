@@ -6,9 +6,17 @@ import { GraphQLError } from 'graphql';
 import { ValidationError } from 'class-validator';
 import { UserModule } from './user/user.module';
 import { GraphQLExceptionFilter } from './graphql-exception.filter';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { AuthModule } from './auth/auth.module';
+import { AuthGuard } from './shared/guards/auth.guard';
 
 @Module({
   imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    }),
     ClientsModule.register([
       {
         name: 'USER_PACKAGE',
@@ -19,8 +27,18 @@ import { GraphQLExceptionFilter } from './graphql-exception.filter';
           url: 'localhost:50051',
         },
       },
+      {
+        name: 'AUTH_PACKAGE',
+        transport: Transport.GRPC,
+        options: {
+          package: 'auth',
+          protoPath: join(__dirname, '../../proto/auth.proto'),
+          url: 'localhost:50052',
+        },
+      },
     ]),
     UserModule,
+    AuthModule,
   ],
   providers: [
     {
@@ -43,6 +61,10 @@ import { GraphQLExceptionFilter } from './graphql-exception.filter';
           });
         },
       }),
+    },
+    {
+      provide: 'APP_GUARD', // গ্লোবাল গার্ড
+      useClass: AuthGuard,
     },
   ],
   exports: [ClientsModule], // Export ClientsModule to make USER_PACKAGE available

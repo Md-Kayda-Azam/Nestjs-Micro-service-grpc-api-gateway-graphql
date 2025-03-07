@@ -3,13 +3,10 @@
 # ------------------------------------------------------
 
 type Device {
-  _id: ID!
   deviceId: String!
   ipAddress: String!
   userAgent: String!
   location: String
-  createdAt: String
-  updatedAt: String
 }
 
 type User {
@@ -39,19 +36,35 @@ type User {
   verificationBlockedUntil: String
   isDeleted: Boolean!
   refreshToken: String
+  accessToken: String
   createdAt: String
   updatedAt: String
+}
+
+type ResponseMessage {
+  message: String!
+  code: String
+}
+
+type LogoutResponse {
+  success: Boolean!
+  message: String!
 }
 
 type Query {
   users: [User!]!
   user(email: String!): User!
+  me: User!
 }
 
 type Mutation {
   createUser(input: CreateUserInput!): User!
   updateUser(input: UpdateUserInput!): User!
   deleteUser(id: String!): Boolean!
+  verifyAccount(input: verifyAccountInput!): User!
+  resendVerification(input: resendVerificationInput!): ResponseMessage!
+  login(input: loginInput!): User!
+  logout: LogoutResponse!
 }
 
 input CreateUserInput {
@@ -74,4 +87,18 @@ input UpdateUserInput {
   mfaEnabled: Boolean
   isVerified: Boolean
   refreshToken: String
+}
+
+input verifyAccountInput {
+  token: String!
+  password: String!
+}
+
+input resendVerificationInput {
+  email: String!
+}
+
+input loginInput {
+  email: String!
+  password: String!
 }

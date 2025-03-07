@@ -2,48 +2,81 @@ syntax = "proto3";
 
 package auth;
 
-// Auth Service Definition
 service AuthService {
-  // Resend Verification
-  rpc ResendVerification (ResendVerificationRequest) returns (ResendVerificationResponse) {}
-
-  // Verify Account
-  rpc VerifyUser (VerifyUserRequest) returns (VerifyUserResponse) {}
-
-  // Login
+  rpc ResendVerification (ResendVerificationRequest) returns (Empty) {}
+  rpc VerifyAccount (VerifyAccountRequest) returns (AuthResponse) {}
   rpc Login (LoginRequest) returns (LoginResponse) {}
-
-  // Refresh Token
-  rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenResponse) {}
-
-  // Request Password Reset
-  rpc RequestPasswordReset (RequestPasswordResetRequest) returns (RequestPasswordResetResponse) {}
-
-  // Reset Password
-  rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse) {}
-
-  // Logout
+  rpc RefreshToken (RefreshTokenRequest) returns (LoginResponse) {}
+  rpc RequestPasswordReset (RequestPasswordResetRequest) returns (Empty) {}
+  rpc ResetPassword (ResetPasswordRequest) returns (AuthResponse) {}
+  rpc GetMe (GetMeRequest) returns (GetMeResponse) {}
   rpc Logout (LogoutRequest) returns (LogoutResponse) {}
 }
 
-// Message Definitions
+message Empty {}
 
-// Resend Verification
+message RegisterUserRequest {
+  string firstName = 1;
+  string lastName = 2;
+  string email = 3;
+  string password = 4;
+  string role = 5;
+  string school = 6;
+}
+
 message ResendVerificationRequest {
   string email = 1;
 }
 
-message ResendVerificationResponse {
-  string message = 1;
-}
-
-// Verify User
-message VerifyUserRequest {
+message VerifyAccountRequest {
   string token = 1;
   string password = 2;
 }
 
-message VerifyUserResponse {
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+  string userAgent = 3;
+}
+
+message RefreshTokenRequest {
+  string refreshToken = 1;
+}
+
+message RequestPasswordResetRequest {
+  string email = 1;
+}
+
+message ResetPasswordRequest {
+  string token = 1;
+  string newPassword = 2;
+}
+
+message LogoutRequest {
+  string token = 1;
+}
+
+message LogoutResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetMeRequest {
+  string token = 1;
+}
+
+message GetMeResponse {
+  AuthResponse user = 1;
+}
+
+message Device {
+  string deviceId = 2;
+  string ipAddress = 3;
+  string userAgent = 4;
+  optional string location = 5;
+}
+
+message AuthResponse {
   string id = 1;
   string firstName = 2;
   string lastName = 3;
@@ -51,89 +84,31 @@ message VerifyUserResponse {
   string role = 5;
   string school = 6;
   bool isActive = 7;
-  string lastActive = 8; // ISO string
+  optional string lastActive = 8;
   bool mfaEnabled = 9;
-  string mfaSecret = 10;
+  optional string mfaSecret = 10;
   repeated Device devices = 11;
   repeated string notifications = 12;
-  string lastPasswordChanged = 13; // ISO string
-  string resetPasswordExpires = 14; // ISO string
-  string verificationTokenExpires = 15; // ISO string
-  string verificationRequestedAt = 16; // ISO string
-  string verificationBlockedUntil = 17; // ISO string
-  bool isVerified = 18;
-  bool isDeleted = 19;
-  string refreshToken = 20;
-  string createdAt = 21; // ISO string
-  string updatedAt = 22; // ISO string
-}
-
-// Login
-message LoginRequest {
-  string email = 1;
-  string password = 2;
+  optional string lastPasswordChanged = 13;
+  optional string resetPasswordToken = 14;
+  optional string resetPasswordExpires = 15;
+  optional string resetRequestedAt = 16;
+  optional int32 resetRequestCount = 17;
+  optional string resetBlockedUntil = 18;
+  bool isVerified = 19;
+  optional string verificationToken = 20;
+  optional string verificationTokenExpires = 21;
+  optional string verificationRequestedAt = 22;
+  optional int32 verificationRequestCount = 23;
+  optional string verificationBlockedUntil = 24;
+  bool isDeleted = 25;
+  optional string refreshToken = 26;
+  optional string createdAt = 27;
+  optional string updatedAt = 28;
 }
 
 message LoginResponse {
   string accessToken = 1;
   string refreshToken = 2;
-  User user = 3;
-}
-
-// Refresh Token
-message RefreshTokenRequest {
-  string refreshToken = 1;
-}
-
-message RefreshTokenResponse {
-  string accessToken = 1;
-  string refreshToken = 2;
-}
-
-// Request Password Reset
-message RequestPasswordResetRequest {
-  string email = 1;
-}
-
-message RequestPasswordResetResponse {
-  string message = 1;
-}
-
-// Reset Password
-message ResetPasswordRequest {
-  string token = 1;
-  string newPassword = 2;
-}
-
-message ResetPasswordResponse {
-  string message = 1;
-}
-
-// Logout
-message LogoutRequest {
-  string refreshToken = 1;
-}
-
-message LogoutResponse {
-  string message = 1;
-}
-
-// Nested Messages
-message User {
-  string id = 1;
-  string firstName = 2;
-  string lastName = 3;
-  string email = 4;
-  string role = 5;
-  string school = 6;
-}
-
-message Device {
-  string id = 1;
-  string deviceId = 2;
-  string ipAddress = 3;
-  string userAgent = 4;
-  string location = 5;
-  string createdAt = 6; // ISO string
-  string updatedAt = 7; // ISO string
+  AuthResponse user = 3;
 }

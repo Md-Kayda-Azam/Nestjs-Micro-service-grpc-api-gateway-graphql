@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Auth, AuthDocument } from './schema/auth.schema';
+import { Device, User, UserDocument } from './schema/user.schema';
 import { Model } from 'mongoose';
 import * as grpc from '@grpc/grpc-js';
 import { RpcException } from '@nestjs/microservices';
@@ -19,16 +19,15 @@ import {
 } from './types/authTypes';
 import {
   sendResetEmail,
+  sendSecurityAlertEmail,
   sendVerificationEmail,
 } from './utils/VerificationEmail';
+import { IpAddressGet } from './api/IpAddressGet';
+import { generateDeviceId } from './utils/generateDeviceId';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(Auth.name) private authModel: Model<AuthDocument>) {}
-
-  private readonly JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // .env থেকে নেওয়া উচিত
-  private readonly REFRESH_SECRET =
-    process.env.REFRESH_SECRET || 'your-refresh-secret'; // .env থেকে নেওয়া উচিত
+  constructor(@InjectModel(User.name) private authModel: Model<UserDocument>) {}
 
   getHello(): string {
     return 'Hello World!';
@@ -82,13 +81,10 @@ export class AuthService {
       ...restUserObject,
       lastActive: userObject.lastActive?.toISOString(),
       devices: userObject.devices?.map((device) => ({
-        id: device._id.toString(),
         deviceId: device.deviceId,
         ipAddress: device.ipAddress,
         userAgent: device.userAgent,
         location: device.location,
-        createdAt: device.createdAt?.toISOString(),
-        updatedAt: device.updatedAt?.toISOString(),
       })),
       lastPasswordChanged: userObject.lastPasswordChanged?.toISOString(),
       resetPasswordExpires: userObject.resetPasswordExpires?.toISOString(),
@@ -109,7 +105,7 @@ export class AuthService {
     if (!user) {
       throw new RpcException({
         code: grpc.status.NOT_FOUND,
-        message: 'User not found',
+        message: 'Invalid email address, please vaild email try again!',
       });
     }
 
@@ -123,13 +119,13 @@ export class AuthService {
     const now = new Date();
     await checkRateLimit(user, 'verification');
 
-    if (user.verificationTokenExpires && user.verificationTokenExpires > now) {
-      throw new RpcException({
-        code: grpc.status.FAILED_PRECONDITION,
-        message:
-          'Your previous verification link is still valid. Please check your email.',
-      });
-    }
+    // if (user.verificationTokenExpires && user.verificationTokenExpires > now) {
+    //   throw new RpcException({
+    //     code: grpc.status.FAILED_PRECONDITION,
+    //     message:
+    //       'Your previous verification link is still valid. Please check your email.',
+    //   });
+    // }
 
     const newVerificationToken = randomBytes(16).toString('hex');
     user.verificationToken = newVerificationToken;
@@ -165,17 +161,18 @@ export class AuthService {
   // Login
   async login(data: LoginData): Promise<any> {
     const user = await this.authModel.findOne({ email: data.email }).exec();
+
     if (!user) {
       throw new RpcException({
         code: grpc.status.NOT_FOUND,
-        message: 'Invalid email or password',
+        message: 'Email not found. Please provide a registered email address.',
       });
     }
 
     if (!user.isVerified) {
       throw new RpcException({
         code: grpc.status.FAILED_PRECONDITION,
-        message: 'Account not verified. Please verify your email.',
+        message: 'Account not verified. Verify your email to proceed.',
       });
     }
 
@@ -185,20 +182,68 @@ export class AuthService {
     ) {
       throw new RpcException({
         code: grpc.status.UNAUTHENTICATED,
-        message: 'Invalid email or password',
+        message: 'Invalid credentials. Check your email and password.',
       });
     }
 
+    const userAgent = data.userAgent;
+    const ipData = await IpAddressGet(); // ধরে নিচ্ছি এটা একটা ফাংশন যা IP ডাটা রিটার্ন করে
+    const ipAddress = ipData.ip;
+    const location = `${ipData.city}, ${ipData.country}`;
+    const deviceId = generateDeviceId(ipAddress, 'userAgent', 'en-US');
+
+    // 3. ডিভাইস ম্যানেজমেন্ট
+    user.devices = user.devices || []; // নিশ্চিত করা যে devices অ্যারে আছে
+    const existingDevice = user.devices.find(
+      (d: Device) => d.deviceId === deviceId,
+    );
+
+    if (!existingDevice) {
+      const newDevice: Device = {
+        deviceId,
+        ipAddress,
+        userAgent,
+        location,
+      };
+      user.devices.push(newDevice);
+
+      // সিকিউরিটি অ্যালার্ট (শুধু যদি এটা প্রথম ডিভাইস না হয়)
+      if (user.devices.length > 1) {
+        await sendSecurityAlertEmail(
+          user.email,
+          location,
+          ipAddress,
+          userAgent,
+        );
+      }
+    } else {
+      // বিদ্যমান ডিভাইস আপডেট
+      existingDevice.ipAddress = ipAddress;
+      existingDevice.userAgent = userAgent;
+      existingDevice.location = location;
+    }
+
+    // 4. JWT টোকেন জেনারেট
+    const payload = {
+      sub: user._id.toString(),
+      email: user.email,
+      deviceId,
+      ipAddress,
+    };
     const accessToken = jwt.sign(
-      { id: user._id.toString(), email: user.email, role: user.role },
-      this.JWT_SECRET,
-      { expiresIn: '15m' }, // Access token ১৫ মিনিট মেয়াদ
+      payload,
+      process.env.JWT_SECRET || 'Q7k9P2mX4vR8tW5wY3nF6jH0eD9cA9bB',
+      {
+        expiresIn: '15m',
+      },
     );
 
     const refreshToken = jwt.sign(
-      { id: user._id.toString(), email: user.email },
-      this.REFRESH_SECRET,
-      { expiresIn: '7d' }, // Refresh token ৭ দিন মেয়াদ
+      payload,
+      process.env.JWT_REFRESH_SECRET || 'Q7k9P2mX4vR8tW5wY3nF6jH0eD9cA9bB',
+      {
+        expiresIn: '7d',
+      },
     );
 
     user.refreshToken = refreshToken;
@@ -218,6 +263,44 @@ export class AuthService {
     };
   }
 
+  async getMe(token: string): Promise<{ user: any }> {
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET || '', {
+        algorithms: ['HS256'],
+      });
+    } catch {
+      throw new RpcException({
+        code: grpc.status.UNAUTHENTICATED,
+        message: 'Invalid or expired token',
+      });
+    }
+
+    const user = await this.authModel.findById(decoded.sub).exec();
+    if (!user) {
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
+        message: 'User not found',
+      });
+    }
+
+    return {
+      user: {
+        id: user._id.toString(),
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        school: user.school,
+        isActive: user.isActive,
+        lastActive: user.lastActive?.toISOString() || '',
+        mfaEnabled: user.mfaEnabled,
+        isVerified: user.isVerified,
+        isDeleted: user.isDeleted,
+      },
+    };
+  }
+
   // Refresh Token
   async refreshToken(data: RefreshTokenData): Promise<any> {
     const user = await this.authModel
@@ -231,7 +314,7 @@ export class AuthService {
     }
 
     try {
-      jwt.verify(data.refreshToken, this.REFRESH_SECRET);
+      jwt.verify(data.refreshToken, process.env.JWT_REFRESH_SECRET || '');
     } catch (error) {
       throw new RpcException({
         code: grpc.status.UNAUTHENTICATED,
@@ -241,7 +324,7 @@ export class AuthService {
 
     const newAccessToken = jwt.sign(
       { id: user._id.toString(), email: user.email, role: user.role },
-      this.JWT_SECRET,
+      process.env.JWT_SECRET || 'default_refresh_secret',
       { expiresIn: '15m' }, // নতুন Access token ১৫ মিনিট মেয়াদ
     );
 
@@ -340,31 +423,31 @@ export class AuthService {
   }
 
   // Logout
-  async logout(data: LogoutData): Promise<any> {
-    const user = await this.authModel
-      .findOne({ refreshToken: data.refreshToken })
-      .exec();
+  async logout(token: string): Promise<{ success: boolean; message: string }> {
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET || '');
+    } catch {
+      throw new RpcException({
+        code: grpc.status.UNAUTHENTICATED,
+        message: 'Invalid or expired token',
+      });
+    }
+
+    const user = await this.authModel.findById(decoded.sub).exec();
     if (!user) {
       throw new RpcException({
         code: grpc.status.NOT_FOUND,
-        message: 'Invalid refresh token',
+        message: 'User not found',
       });
     }
 
-    try {
-      jwt.verify(
-        data.refreshToken,
-        process.env.REFRESH_SECRET || 'your-refresh-secret',
-      );
-    } catch (error) {
-      throw new RpcException({
-        code: grpc.status.UNAUTHENTICATED,
-        message: 'Refresh token is invalid or expired',
-      });
-    }
-
-    user.refreshToken = undefined;
+    user.refreshToken = null;
     await user.save();
-    return { message: 'Logged out successfully' };
+
+    return {
+      success: true,
+      message: 'Successfully logged out',
+    };
   }
 }

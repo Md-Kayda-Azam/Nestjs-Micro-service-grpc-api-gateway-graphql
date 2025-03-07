@@ -111,11 +111,25 @@ export class AuthController {
     }
   }
 
+  // GetMe API
+  @GrpcMethod('AuthService', 'GetMe')
+  async getMe(data: { token: string }) {
+    try {
+      const result = await this.authService.getMe(data.token);
+      return result;
+    } catch (error) {
+      if (error instanceof RpcException) throw error;
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
+        message: 'Failed to get user data',
+      });
+    }
+  }
   // Logout API
   @GrpcMethod('AuthService', 'Logout')
-  async logout(data: LogoutData) {
+  async logout(data: { token: string }) {
     try {
-      const result = await this.authService.logout(data);
+      const result = await this.authService.logout(data.token);
       return result;
     } catch (error) {
       if (error instanceof RpcException) throw error;

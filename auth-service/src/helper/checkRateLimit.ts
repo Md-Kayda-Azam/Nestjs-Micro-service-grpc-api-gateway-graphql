@@ -1,9 +1,9 @@
 import { RpcException } from '@nestjs/microservices';
 import * as grpc from '@grpc/grpc-js';
-import { AuthDocument } from 'src/schema/auth.schema';
+import { UserDocument } from 'src/schema/user.schema';
 
 export const checkRateLimit = async (
-  user: AuthDocument,
+  user: UserDocument,
   type: 'verification' | 'reset',
 ) => {
   const now = new Date();
