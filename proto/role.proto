@@ -1,0 +1,78 @@
+syntax = "proto3";
+package role;
+
+service RoleService {
+  rpc CreateRole (CreateRoleRequest) returns (RoleResponse) {}
+  rpc GetAllRoles (GetAllRolesRequest) returns (GetAllRolesResponse) {}
+  rpc GetRole (GetRoleRequest) returns (RoleResponse) {}
+  rpc UpdateRole (UpdateRoleRequest) returns (RoleResponse) {}
+  rpc DeleteRole (DeleteRoleRequest) returns (DeleteRoleResponse) {}
+  rpc CreateManyRoles (CreateManyRolesRequest) returns (CreateManyRolesResponse) {}
+  rpc DeleteManyRoles (DeleteManyRolesRequest) returns (DeleteManyRolesResponse) {}
+}
+
+message CreateRoleRequest {
+  string name = 1;
+  repeated string permissionIds = 2; // Permission-এর ID গুলো
+  string description = 3;
+  bool isActive = 4;
+}
+
+message RoleResponse {
+  string id = 1;
+  string name = 2;
+  repeated string permissionIds = 3; // Permission-এর ID গুলো
+  string description = 4;
+  bool isActive = 5;
+  string createdAt = 6;
+  string updatedAt = 7;
+}
+
+message GetAllRolesRequest {
+  bool isActive = 1;
+  int32 limit = 2;
+  int32 offset = 3; 
+}
+
+message GetAllRolesResponse {
+  repeated RoleResponse roles = 1;
+  int32 total = 2; 
+}
+
+message GetRoleRequest {
+  string id = 1;
+}
+
+message UpdateRoleRequest {
+  string id = 1;
+  string name = 2;
+  repeated string permissionIds = 3;
+  string description = 4;
+  bool isActive = 5;
+}
+
+message DeleteRoleRequest {
+  string id = 1;
+}
+
+message DeleteRoleResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message CreateManyRolesRequest {
+  repeated CreateRoleRequest roles = 1;
+}
+
+message CreateManyRolesResponse {
+  repeated RoleResponse roles = 1;
+}
+
+message DeleteManyRolesRequest {
+  repeated string ids = 1;
+}
+
+message DeleteManyRolesResponse {
+  bool success = 1;
+  string message = 2;
+}

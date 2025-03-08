@@ -1,0 +1,123 @@
+syntax = "proto3";
+package teacher;
+
+service TeacherService {
+  rpc CreateTeacher (CreateTeacherRequest) returns (TeacherResponse) {}
+  rpc GetAllTeachers (GetAllTeachersRequest) returns (GetAllTeachersResponse) {}
+  rpc GetTeacher (GetTeacherRequest) returns (TeacherResponse) {}
+  rpc UpdateTeacher (UpdateTeacherRequest) returns (TeacherResponse) {}
+  rpc DeleteTeacher (DeleteTeacherRequest) returns (DeleteTeacherResponse) {}
+  rpc CreateManyTeachers (CreateManyTeachersRequest) returns (CreateManyTeachersResponse) {}
+  rpc DeleteManyTeachers (DeleteManyTeachersRequest) returns (DeleteManyTeachersResponse) {}
+}
+
+message CreateTeacherRequest {
+  string schoolId = 1;
+  string email = 2;
+  string phoneNumber = 3;
+  string address = 4;
+  string subject = 5;
+  repeated string qualifications = 6;
+  string hireDate = 7; // Date as string (ISO format)
+  string profilePictureUrl = 8;
+  string status = 9;
+  string dateOfBirth = 10; // Date as string (ISO format)
+  string gender = 11;
+  string nationality = 12;
+  map<string, string> socialMediaLinks = 13;
+  string emergencyContact = 14;
+  double salary = 15;
+  int32 teachingExperienceYears = 16;
+  repeated string assignedClasses = 17;
+  repeated string assignedSubjects = 18;
+  int32 studentCount = 19;
+}
+
+message TeacherResponse {
+  string id = 1;
+  string schoolId = 2;
+  string email = 3;
+  string phoneNumber = 4;
+  string address = 5;
+  string subject = 6;
+  repeated string qualifications = 7;
+  string hireDate = 8; // Date as string (ISO format)
+  string profilePictureUrl = 9;
+  string status = 10;
+  string dateOfBirth = 11; // Date as string (ISO format)
+  string gender = 12;
+  string nationality = 13;
+  map<string, string> socialMediaLinks = 14;
+  string emergencyContact = 15;
+  double salary = 16;
+  int32 teachingExperienceYears = 17;
+  repeated string assignedClasses = 18;
+  repeated string assignedSubjects = 19;
+  int32 studentCount = 20;
+  string createdAt = 21;
+  string updatedAt = 22;
+}
+
+message GetAllTeachersRequest {
+  string status = 1; // ফিল্টারের জন্য (Active/Inactive)
+  int32 limit = 2; // পেজিনেশনের জন্য
+  int32 offset = 3; // পেজিনেশনের জন্য
+}
+
+message GetAllTeachersResponse {
+  repeated TeacherResponse teachers = 1;
+  int32 total = 2; // মোট রেকর্ড সংখ্যা
+}
+
+message GetTeacherRequest {
+  string id = 1;
+}
+
+message UpdateTeacherRequest {
+  string id = 1;
+  string schoolId = 2;
+  string email = 3;
+  string phoneNumber = 4;
+  string address = 5;
+  string subject = 6;
+  repeated string qualifications = 7;
+  string hireDate = 8; // Date as string (ISO format)
+  string profilePictureUrl = 9;
+  string status = 10;
+  string dateOfBirth = 11; // Date as string (ISO format)
+  string gender = 12;
+  string nationality = 13;
+  map<string, string> socialMediaLinks = 14;
+  string emergencyContact = 15;
+  double salary = 16;
+  int32 teachingExperienceYears = 17;
+  repeated string assignedClasses = 18;
+  repeated string assignedSubjects = 19;
+  int32 studentCount = 20;
+}
+
+message DeleteTeacherRequest {
+  string id = 1;
+}
+
+message DeleteTeacherResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message CreateManyTeachersRequest {
+  repeated CreateTeacherRequest teachers = 1;
+}
+
+message CreateManyTeachersResponse {
+  repeated TeacherResponse teachers = 1;
+}
+
+message DeleteManyTeachersRequest {
+  repeated string ids = 1;
+}
+
+message DeleteManyTeachersResponse {
+  bool success = 1;
+  string message = 2;
+}

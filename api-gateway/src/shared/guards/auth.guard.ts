@@ -7,6 +7,12 @@ import {
 import { GqlExecutionContext } from '@nestjs/graphql';
 import * as jwt from 'jsonwebtoken';
 
+interface JwtPayload {
+  sub: string;
+  email: string;
+  role: string;
+}
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -26,14 +32,14 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || '', {
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        throw new Error('JWT_SECRET is not defined in .env'); // নিশ্চিত করার জন্য
+      }
+      const decoded = jwt.verify(token, secret, {
         algorithms: ['HS256'],
-      }) as {
-        sub: string;
-        email: string;
-        role: string;
-      };
-      request.user = decoded; // ইউজার ডাটা রিকোয়েস্টে সেট করা
+      }) as JwtPayload;
+      request.user = decoded;
       return true;
     } catch {
       throw new UnauthorizedException('Invalid or expired token');

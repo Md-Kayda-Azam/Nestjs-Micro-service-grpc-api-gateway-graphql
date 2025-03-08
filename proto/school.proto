@@ -1,0 +1,156 @@
+syntax = "proto3";
+package school;
+
+service SchoolService {
+  rpc CreateSchool (CreateSchoolRequest) returns (SchoolResponse) {}
+  rpc GetAllSchools (GetAllSchoolsRequest) returns (GetAllSchoolsResponse) {}
+  rpc GetSchool (GetSchoolRequest) returns (SchoolResponse) {}
+  rpc UpdateSchool (UpdateSchoolRequest) returns (SchoolResponse) {}
+  rpc DeleteSchool (DeleteSchoolRequest) returns (DeleteSchoolResponse) {}
+  rpc CreateManySchools (CreateManySchoolsRequest) returns (CreateManySchoolsResponse) {}
+  rpc DeleteManySchools (DeleteManySchoolsRequest) returns (DeleteManySchoolsResponse) {}
+}
+
+message CreateSchoolRequest {
+  string name = 1;
+  string address = 2;
+  string phoneNumber = 3;
+  repeated string courses = 4;
+  string principal = 5;
+  string website = 6;
+  bool isActive = 7;
+  repeated string staff = 8;
+  string logoUrl = 9;
+  int32 studentCount = 10;
+  int32 teacherCount = 11;
+  int32 establishedYear = 12;
+  string schoolType = 13;
+  string region = 14;
+  repeated string extracurricularActivities = 15;
+  repeated string affiliations = 16;
+  string accreditationStatus = 17;
+  string country = 18;
+  string city = 19;
+  string postalCode = 20;
+  map<string, string> socialMediaLinks = 21;
+  string lastInspectionDate = 22; // Date as string (ISO format)
+  int32 totalCampusArea = 23;
+  int32 numberOfBuildings = 24;
+  repeated string languagesOffered = 25;
+  int32 studentTeacherRatio = 26;
+  string schoolLogo = 27;
+  bool isOnlineLearningAvailable = 28;
+  int32 numberOfClassrooms = 29;
+  repeated string schoolEvents = 30;
+}
+
+message SchoolResponse {
+  string id = 1;
+  string name = 2;
+  string address = 3;
+  string phoneNumber = 4;
+  repeated string courses = 5;
+  string principal = 6;
+  string website = 7;
+  bool isActive = 8;
+  repeated string staff = 9;
+  string logoUrl = 10;
+  int32 studentCount = 11;
+  int32 teacherCount = 12;
+  int32 establishedYear = 13;
+  string schoolType = 14;
+  string region = 15;
+  repeated string extracurricularActivities = 16;
+  repeated string affiliations = 17;
+  string accreditationStatus = 18;
+  string country = 19;
+  string city = 20;
+  string postalCode = 21;
+  map<string, string> socialMediaLinks = 22;
+  string lastInspectionDate = 23; // Date as string (ISO format)
+  int32 totalCampusArea = 24;
+  int32 numberOfBuildings = 25;
+  repeated string languagesOffered = 26;
+  int32 studentTeacherRatio = 27;
+  string schoolLogo = 28;
+  bool isOnlineLearningAvailable = 29;
+  int32 numberOfClassrooms = 30;
+  repeated string schoolEvents = 31;
+  string createdAt = 32;
+  string updatedAt = 33;
+}
+
+message GetAllSchoolsRequest {
+  bool isActive = 1;
+  int32 limit = 2; // পেজিনেশনের জন্য
+  int32 offset = 3; // পেজিনেশনের জন্য
+}
+
+message GetAllSchoolsResponse {
+  repeated SchoolResponse schools = 1;
+  int32 total = 2; // মোট রেকর্ড সংখ্যা
+}
+
+message GetSchoolRequest {
+  string id = 1;
+}
+
+message UpdateSchoolRequest {
+  string id = 1;
+  string name = 2;
+  string address = 3;
+  string phoneNumber = 4;
+  repeated string courses = 5;
+  string principal = 6;
+  string website = 7;
+  bool isActive = 8;
+  repeated string staff = 9;
+  string logoUrl = 10;
+  int32 studentCount = 11;
+  int32 teacherCount = 12;
+  int32 establishedYear = 13;
+  string schoolType = 14;
+  string region = 15;
+  repeated string extracurricularActivities = 16;
+  repeated string affiliations = 17;
+  string accreditationStatus = 18;
+  string country = 19;
+  string city = 20;
+  string postalCode = 21;
+  map<string, string> socialMediaLinks = 22;
+  string lastInspectionDate = 23;
+  int32 totalCampusArea = 24;
+  int32 numberOfBuildings = 25;
+  repeated string languagesOffered = 26;
+  int32 studentTeacherRatio = 27;
+  string schoolLogo = 28;
+  bool isOnlineLearningAvailable = 29;
+  int32 numberOfClassrooms = 30;
+  repeated string schoolEvents = 31;
+}
+
+message DeleteSchoolRequest {
+  string id = 1;
+}
+
+message DeleteSchoolResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message CreateManySchoolsRequest {
+  repeated CreateSchoolRequest schools = 1;
+}
+
+message CreateManySchoolsResponse {
+  repeated SchoolResponse schools = 1;
+}
+
+message DeleteManySchoolsRequest {
+  repeated string ids = 1;
+}
+
+message DeleteManySchoolsResponse {
+  bool success = 1;
+  string message = 2;
+}

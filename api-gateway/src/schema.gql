@@ -51,6 +51,15 @@ type LogoutResponse {
   message: String!
 }
 
+type Permission {
+  _id: ID!
+  name: String!
+  description: String
+  isActive: Boolean!
+  createdAt: String
+  updatedAt: String
+}
+
 type Query {
   users: [User!]!
   user(email: String!): User!
@@ -65,6 +74,7 @@ type Mutation {
   resendVerification(input: resendVerificationInput!): ResponseMessage!
   login(input: loginInput!): User!
   logout: LogoutResponse!
+  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
 }
 
 input CreateUserInput {
@@ -101,4 +111,10 @@ input resendVerificationInput {
 input loginInput {
   email: String!
   password: String!
+}
+
+input CreatePermissionInput {
+  name: String!
+  description: String!
+  isActive: Boolean!
 }

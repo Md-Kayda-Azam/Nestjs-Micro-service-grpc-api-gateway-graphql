@@ -1,0 +1,99 @@
+syntax = "proto3";
+package parent;
+
+service ParentService {
+  rpc CreateParent (CreateParentRequest) returns (ParentResponse) {}
+  rpc GetAllParents (GetAllParentsRequest) returns (GetAllParentsResponse) {}
+  rpc GetParent (GetParentRequest) returns (ParentResponse) {}
+  rpc UpdateParent (UpdateParentRequest) returns (ParentResponse) {}
+  rpc DeleteParent (DeleteParentRequest) returns (DeleteParentResponse) {}
+  rpc CreateManyParents (CreateManyParentsRequest) returns (CreateManyParentsResponse) {}
+  rpc DeleteManyParents (DeleteManyParentsRequest) returns (DeleteManyParentsResponse) {}
+}
+
+message CreateParentRequest {
+  string schoolId = 1;
+  string relationshipToStudent = 2;
+  string phoneNumber = 3;
+  string email = 4;
+  string address = 5;
+  string occupation = 6;
+  repeated string emergencyContacts = 7;
+  string profilePictureUrl = 8;
+  repeated string associatedStudents = 9;
+  bool isPrimaryGuardian = 10;
+  string notes = 11;
+}
+
+message ParentResponse {
+  string id = 1;
+  string schoolId = 2;
+  string relationshipToStudent = 3;
+  string phoneNumber = 4;
+  string email = 5;
+  string address = 6;
+  string occupation = 7;
+  repeated string emergencyContacts = 8;
+  string profilePictureUrl = 9;
+  repeated string associatedStudents = 10;
+  bool isPrimaryGuardian = 11;
+  string notes = 12;
+  string createdAt = 13;
+  string updatedAt = 14;
+}
+
+message GetAllParentsRequest {
+  string schoolId = 1; // ফিল্টারের জন্য
+  int32 limit = 2; // পেজিনেশনের জন্য
+  int32 offset = 3; // পেজিনেশনের জন্য
+}
+
+message GetAllParentsResponse {
+  repeated ParentResponse parents = 1;
+  int32 total = 2; // মোট রেকর্ড সংখ্যা
+}
+
+message GetParentRequest {
+  string id = 1;
+}
+
+message UpdateParentRequest {
+  string id = 1;
+  string schoolId = 2;
+  string relationshipToStudent = 3;
+  string phoneNumber = 4;
+  string email = 5;
+  string address = 6;
+  string occupation = 7;
+  repeated string emergencyContacts = 8;
+  string profilePictureUrl = 9;
+  repeated string associatedStudents = 10;
+  bool isPrimaryGuardian = 11;
+  string notes = 12;
+}
+
+message DeleteParentRequest {
+  string id = 1;
+}
+
+message DeleteParentResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message CreateManyParentsRequest {
+  repeated CreateParentRequest parents = 1;
+}
+
+message CreateManyParentsResponse {
+  repeated ParentResponse parents = 1;
+}
+
+message DeleteManyParentsRequest {
+  repeated string ids = 1;
+}
+
+message DeleteManyParentsResponse {
+  bool success = 1;
+  string message = 2;
+}
