@@ -56,7 +56,7 @@ export class School {
     default: undefined, // ডিফল্ট undefined
     trim: true,
   })
-  website: string; // স্কুলের ওয়েবসাইট
+  website: string | null; // স্কুলের ওয়েবসাইট
 
   @Prop({
     type: Boolean,
@@ -75,7 +75,7 @@ export class School {
     default: undefined, // ডিফল্ট undefined
     trim: true,
   })
-  logoUrl: string; // স্কুলের লোগোর URL
+  logoUrl: string | null; // স্কুলের লোগোর URL
 
   @Prop({
     type: Number,
@@ -132,7 +132,7 @@ export class School {
     default: undefined, // ডিফল্ট undefined
     trim: true,
   })
-  accreditationStatus: string; // স্কুলের এক্রেডিটেশন স্ট্যাটাস
+  accreditationStatus: string | null; // স্কুলের এক্রেডিটেশন স্ট্যাটাস
 
   @Prop({
     required: true,
@@ -156,10 +156,18 @@ export class School {
   postalCode: string; // পোস্টাল কোড
 
   @Prop({
-    type: Object, // Record<string, string> এর জন্য Object ব্যবহার
-    default: undefined, // ডিফল্ট undefined
+    type: Object,
+    validate: {
+      validator: (v: Record<string, string>) => {
+        if (!v) return true;
+        return Object.keys(v).every(
+          (key) => typeof key === 'string' && typeof v[key] === 'string',
+        );
+      },
+      message: 'Invalid socialMediaLinks format',
+    },
   })
-  socialMediaLinks: Record<string, string>; // স্কুলের সোশ্যাল মিডিয়া লিঙ্কস
+  socialMediaLinks: Record<string, string> | null;
 
   @Prop({
     type: Date,
@@ -169,7 +177,7 @@ export class School {
       message: 'Invalid lastInspectionDate',
     },
   })
-  lastInspectionDate: Date; // সর্বশেষ পরিদর্শনের তারিখ
+  lastInspectionDate: Date | null; // সর্বশেষ পরিদর্শনের তারিখ
 
   @Prop({
     required: true,
@@ -203,7 +211,7 @@ export class School {
     default: undefined, // ডিফল্ট undefined
     trim: true,
   })
-  schoolLogo: string; // স্কুলের লোগো ফাইলের পাথ
+  schoolLogo: string | null; // স্কুলের লোগো ফাইলের পাথ
 
   @Prop({
     type: Boolean,

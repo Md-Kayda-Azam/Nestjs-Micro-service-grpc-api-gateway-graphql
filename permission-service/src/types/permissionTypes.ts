@@ -10,5 +10,4 @@ export interface PermissionResponse {
 export interface CreatePermissionData {
   name: string;
   description?: string | null; // undefined বা null হতে পারে
-  isActive?: boolean; // optional
 }

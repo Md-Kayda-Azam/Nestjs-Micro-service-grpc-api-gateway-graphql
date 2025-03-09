@@ -9,12 +9,12 @@ service PermissionService {
   rpc DeletePermission (DeletePermissionRequest) returns (DeletePermissionResponse) {}
   rpc CreateManyPermissions (CreateManyPermissionsRequest) returns (CreateManyPermissionsResponse) {}
   rpc DeleteManyPermissions (DeleteManyPermissionsRequest) returns (DeleteManyPermissionsResponse) {}
+  rpc GetManyPermissions (GetManyPermissionsRequest) returns (GetManyPermissionsResponse) {}
 }
 
 message CreatePermissionRequest {
   string name = 1;
   string description = 2;
-  bool isActive = 3;
 }
 
 message PermissionResponse {
@@ -27,9 +27,8 @@ message PermissionResponse {
 }
 
 message GetAllPermissionsRequest {
-  bool isActive = 1;
-  int32 limit = 2; // নতুন ফিল্ড
-  int32 offset = 3; // নতুন ফিল্ড
+  int32 limit = 1; // নতুন ফিল্ড
+  int32 offset = 2; // নতুন ফিল্ড
 }
 
 message GetAllPermissionsResponse {
@@ -72,4 +71,13 @@ message DeleteManyPermissionsRequest {
 message DeleteManyPermissionsResponse {
   bool success = 1;
   string message = 2;
+}
+
+message GetManyPermissionsRequest {
+  repeated string ids = 1;
+}
+
+message GetManyPermissionsResponse {
+  repeated PermissionResponse permissions = 1;
+  int32 total = 2;
 }

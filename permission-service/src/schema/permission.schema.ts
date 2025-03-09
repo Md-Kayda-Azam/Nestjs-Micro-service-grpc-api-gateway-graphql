@@ -17,7 +17,7 @@ export class Permission {
   @Prop({ default: null })
   description?: string;
 
-  @Prop({ required: true, default: true })
+  @Prop({ default: true })
   isActive: boolean;
 }
 

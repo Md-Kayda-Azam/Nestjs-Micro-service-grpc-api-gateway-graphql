@@ -15,7 +15,6 @@ message CreateRoleRequest {
   string name = 1;
   repeated string permissionIds = 2; // Permission-এর ID গুলো
   string description = 3;
-  bool isActive = 4;
 }
 
 message RoleResponse {
@@ -29,9 +28,8 @@ message RoleResponse {
 }
 
 message GetAllRolesRequest {
-  bool isActive = 1;
-  int32 limit = 2;
-  int32 offset = 3; 
+  int32 limit = 1;
+  int32 offset = 2; 
 }
 
 message GetAllRolesResponse {

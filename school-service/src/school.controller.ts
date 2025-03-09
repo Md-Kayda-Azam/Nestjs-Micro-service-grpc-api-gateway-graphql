@@ -1,8 +1,8 @@
 import { Controller } from '@nestjs/common';
 import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import * as grpc from '@grpc/grpc-js';
-import { CreateSchoolData, SchoolResponse } from './types/schoolTypes.';
 import { SchoolService } from './school.service';
+import { CreateSchoolData, SchoolResponse } from './types/schoolTypes.';
 
 @Controller()
 export class SchoolController {

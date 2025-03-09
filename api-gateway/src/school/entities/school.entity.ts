@@ -8,6 +8,21 @@ import {
   IsOptional,
 } from 'class-validator';
 
+// SocialMediaLink কাস্টম টাইপ
+@ObjectType()
+@InputType('SocialMediaLinkInput')
+export class SocialMediaLink {
+  @Field(() => String)
+  @IsString()
+  @IsNotEmpty({ message: 'Platform is required' })
+  platform: string;
+
+  @Field(() => String)
+  @IsString()
+  @IsNotEmpty({ message: 'URL is required' })
+  url: string;
+}
+
 @ObjectType()
 export class School {
   @Field(() => String)
@@ -73,8 +88,8 @@ export class School {
   @Field(() => String)
   postalCode: string;
 
-  @Field(() => Object, { nullable: true })
-  socialMediaLinks: { [key: string]: string };
+  @Field(() => [SocialMediaLink], { nullable: true })
+  socialMediaLinks: SocialMediaLink[];
 
   @Field(() => String)
   lastInspectionDate: string;
@@ -212,9 +227,10 @@ export class CreateSchoolInput {
   @IsNotEmpty({ message: 'Postal code is required' })
   postalCode: string;
 
-  @Field(() => Object, { nullable: true })
+  @Field(() => [SocialMediaLink], { nullable: true })
   @IsOptional()
-  socialMediaLinks: { [key: string]: string };
+  @IsArray()
+  socialMediaLinks: SocialMediaLink[];
 
   @Field(() => String)
   @IsString()
@@ -369,9 +385,10 @@ export class UpdateSchoolInput {
   @IsNotEmpty({ message: 'Postal code is required' })
   postalCode: string;
 
-  @Field(() => Object, { nullable: true })
+  @Field(() => [SocialMediaLink], { nullable: true })
   @IsOptional()
-  socialMediaLinks: { [key: string]: string };
+  @IsArray()
+  socialMediaLinks: SocialMediaLink[];
 
   @Field(() => String)
   @IsString()
@@ -421,10 +438,10 @@ export class UpdateSchoolInput {
 
 @InputType()
 export class GetAllSchoolsInput {
-  @Field(() => Boolean)
-  @IsBoolean()
-  @IsNotEmpty({ message: 'IsActive is required' })
-  isActive: boolean;
+  @Field(() => Boolean, { nullable: true }) // GraphQL-এ অপশনাল
+  @IsBoolean() // Boolean হতে হবে
+  @IsOptional() // ভ্যালিডেশনে অপশনাল
+  isActive?: boolean; // TypeScript-এ অপশনাল
 
   @Field(() => Int)
   @IsInt()
@@ -444,6 +461,9 @@ export class GetAllSchoolsOutput {
 
   @Field(() => Int)
   total: number;
+
+  @Field(() => String, { nullable: true }) // নতুন ফিল্ড
+  message?: string;
 }
 
 @ObjectType()

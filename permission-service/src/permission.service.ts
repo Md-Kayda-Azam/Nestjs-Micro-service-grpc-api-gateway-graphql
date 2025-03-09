@@ -32,7 +32,6 @@ export class PermissionService {
     const newPermission = new this.permissionModel({
       name: data.name,
       description: data.description || null, // undefined হলে null হবে
-      isActive: data.isActive !== undefined ? data.isActive : true,
     });
 
     const savedPermission = await newPermission.save();
@@ -48,13 +47,12 @@ export class PermissionService {
   }
 
   async getAllPermissions(data: {
-    isActive?: boolean;
     limit?: number;
     offset?: number;
   }): Promise<{ permissions: PermissionResponse[]; total: number }> {
     try {
       const filter: any = {};
-      if (data.isActive !== undefined) filter.isActive = data.isActive;
+      // if (data.isActive !== undefined) filter.isActive = data.isActive;
 
       // পেজিনেশনের জন্য limit এবং offset সেট করা
       const limit = data.limit ? Math.min(data.limit, 100) : 10; // সর্বোচ্চ 100, ডিফল্ট 10
@@ -81,6 +79,37 @@ export class PermissionService {
           updatedAt: p.updatedAt.toISOString(),
         })),
         total, // টোটাল রেকর্ড সংখ্যা
+      };
+
+      return response;
+    } catch (error) {
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
+        message: 'Failed to fetch permissions',
+      });
+    }
+  }
+  async getManyPermissions(data: {
+    ids: string[];
+  }): Promise<{ permissions: any[]; total: number }> {
+    try {
+      const permissions = await this.permissionModel
+        .find({ _id: { $in: data.ids } })
+        .exec();
+      const total = await this.permissionModel
+        .countDocuments({ _id: { $in: data.ids } })
+        .exec();
+
+      const response = {
+        permissions: permissions.map((p) => ({
+          id: p._id.toString(),
+          name: p.name,
+          description: p.description,
+          isActive: p.isActive,
+          createdAt: p.createdAt.toISOString(),
+          updatedAt: p.updatedAt.toISOString(),
+        })),
+        total,
       };
 
       return response;
@@ -166,7 +195,6 @@ export class PermissionService {
     const permissionsToCreate = data.permissions.map((p) => ({
       name: p.name,
       description: p.description || null,
-      isActive: p.isActive !== undefined ? p.isActive : true,
     }));
 
     const savedPermissions =
@@ -176,8 +204,8 @@ export class PermissionService {
       permissions: savedPermissions.map((p) => ({
         id: p._id.toString(),
         name: p.name,
-        description: p.description,
         isActive: p.isActive,
+        description: p.description,
         createdAt: p.createdAt.toISOString(),
         updatedAt: p.updatedAt.toISOString(),
       })),

@@ -51,85 +51,82 @@ type LogoutResponse {
   message: String!
 }
 
-type Permission {
+type SocialMediaLink {
+  platform: String!
+  url: String!
+}
+
+type School {
   _id: String!
   name: String!
-  description: String!
+  address: String!
+  phoneNumber: String!
+  courses: [String!]!
+  principal: String!
+  website: String!
   isActive: Boolean!
+  staff: [String!]!
+  logoUrl: String!
+  studentCount: Int!
+  teacherCount: Int!
+  establishedYear: Int!
+  schoolType: String!
+  region: String!
+  extracurricularActivities: [String!]!
+  affiliations: [String!]!
+  accreditationStatus: String!
+  country: String!
+  city: String!
+  postalCode: String!
+  socialMediaLinks: [SocialMediaLink!]
+  lastInspectionDate: String!
+  totalCampusArea: Int!
+  numberOfBuildings: Int!
+  languagesOffered: [String!]!
+  studentTeacherRatio: Int!
+  schoolLogo: String!
+  isOnlineLearningAvailable: Boolean!
+  numberOfClassrooms: Int!
+  schoolEvents: [String!]!
   createdAt: String
   updatedAt: String
 }
 
-type GetAllPermissionsOutput {
-  permissions: [Permission!]!
+type GetAllSchoolsOutput {
+  schools: [School!]!
   total: Int!
+  message: String
 }
 
-type DeletePermissionOutput {
+type DeleteSchoolOutput {
   success: Boolean!
   message: String!
 }
 
-type CreateManyPermissionsOutput {
-  permissions: [Permission!]!
+type CreateManySchoolsOutput {
+  schools: [School!]!
 }
 
-type DeleteManyPermissionsOutput {
+type DeleteManySchoolsOutput {
   success: Boolean!
   message: String!
 }
 
-type GetManyPermissionsResponse {
-  permissions: [Permission!]!
-  total: Int!
-}
-
-type Role {
-  _id: String!
-  name: String!
-  permissions: [Permission!]!
-  description: String!
-  isActive: Boolean!
-  createdAt: String
-  updatedAt: String
-}
-
-type GetAllRolesOutput {
-  roles: [Role!]!
-  total: Int!
-}
-
-type DeleteRoleOutput {
-  success: Boolean!
-  message: String!
-}
-
-type CreateManyRolesOutput {
-  roles: [Role!]!
-}
-
-type DeleteManyRolesOutput {
-  success: Boolean!
-  message: String!
+input SocialMediaLinkInput {
+  platform: String!
+  url: String!
 }
 
 type Query {
   users: [User!]!
   user(email: String!): User!
   me: User!
-  getAllRoles(getAllRolesInput: GetAllRolesInput!): GetAllRolesOutput!
-  getRole(id: String!): Role!
-  getAllPermissions(getAllPermissionsInput: GetAllPermissionsInput!): GetAllPermissionsOutput!
-  getPermission(id: String!): Permission!
-  getManyPermissions(ids: [String!]!): GetManyPermissionsResponse!
+  getAllSchools(getAllSchoolsInput: GetAllSchoolsInput!): GetAllSchoolsOutput!
+  getSchool(id: String!): School!
 }
 
-input GetAllRolesInput {
-  limit: Int!
-  offset: Int!
-}
-
-input GetAllPermissionsInput {
+input GetAllSchoolsInput {
+  isActive: Boolean
   limit: Int!
   offset: Int!
 }
@@ -142,16 +139,11 @@ type Mutation {
   resendVerification(input: resendVerificationInput!): ResponseMessage!
   login(input: loginInput!): User!
   logout: LogoutResponse!
-  createRole(createRoleInput: CreateRoleInput!): Role!
-  updateRole(updateRoleInput: UpdateRoleInput!): Role!
-  deleteRole(id: String!): DeleteRoleOutput!
-  createManyRoles(createManyRolesInput: CreateManyRolesInput!): CreateManyRolesOutput!
-  deleteManyRoles(deleteManyRolesInput: DeleteManyRolesInput!): DeleteManyRolesOutput!
-  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
-  updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
-  deletePermission(id: String!): DeletePermissionOutput!
-  createManyPermissions(createManyPermissionsInput: CreateManyPermissionsInput!): CreateManyPermissionsOutput!
-  deleteManyPermissions(deleteManyPermissionsInput: DeleteManyPermissionsInput!): DeleteManyPermissionsOutput!
+  createSchool(createSchoolInput: CreateSchoolInput!): School!
+  updateSchool(updateSchoolInput: UpdateSchoolInput!): School!
+  deleteSchool(id: String!): DeleteSchoolOutput!
+  createManySchools(createManySchoolsInput: CreateManySchoolsInput!): CreateManySchoolsOutput!
+  deleteManySchools(deleteManySchoolsInput: DeleteManySchoolsInput!): DeleteManySchoolsOutput!
 }
 
 input CreateUserInput {
@@ -190,44 +182,77 @@ input loginInput {
   password: String!
 }
 
-input CreateRoleInput {
+input CreateSchoolInput {
   name: String!
-  permissionIds: [String!]!
-  description: String!
+  address: String!
+  phoneNumber: String!
+  courses: [String!]!
+  principal: String!
+  website: String!
+  isActive: Boolean!
+  staff: [String!]!
+  logoUrl: String!
+  studentCount: Int!
+  teacherCount: Int!
+  establishedYear: Int!
+  schoolType: String!
+  region: String!
+  extracurricularActivities: [String!]!
+  affiliations: [String!]!
+  accreditationStatus: String!
+  country: String!
+  city: String!
+  postalCode: String!
+  socialMediaLinks: [SocialMediaLinkInput!]
+  lastInspectionDate: String!
+  totalCampusArea: Int!
+  numberOfBuildings: Int!
+  languagesOffered: [String!]!
+  studentTeacherRatio: Int!
+  schoolLogo: String!
+  isOnlineLearningAvailable: Boolean!
+  numberOfClassrooms: Int!
+  schoolEvents: [String!]!
 }
 
-input UpdateRoleInput {
+input UpdateSchoolInput {
   id: String!
   name: String!
-  permissionIds: [String!]!
-  description: String!
+  address: String!
+  phoneNumber: String!
+  courses: [String!]!
+  principal: String!
+  website: String!
   isActive: Boolean!
+  staff: [String!]!
+  logoUrl: String!
+  studentCount: Int!
+  teacherCount: Int!
+  establishedYear: Int!
+  schoolType: String!
+  region: String!
+  extracurricularActivities: [String!]!
+  affiliations: [String!]!
+  accreditationStatus: String!
+  country: String!
+  city: String!
+  postalCode: String!
+  socialMediaLinks: [SocialMediaLinkInput!]
+  lastInspectionDate: String!
+  totalCampusArea: Int!
+  numberOfBuildings: Int!
+  languagesOffered: [String!]!
+  studentTeacherRatio: Int!
+  schoolLogo: String!
+  isOnlineLearningAvailable: Boolean!
+  numberOfClassrooms: Int!
+  schoolEvents: [String!]!
 }
 
-input CreateManyRolesInput {
-  roles: [CreateRoleInput!]!
+input CreateManySchoolsInput {
+  schools: [CreateSchoolInput!]!
 }
 
-input DeleteManyRolesInput {
-  ids: [String!]!
-}
-
-input CreatePermissionInput {
-  name: String!
-  description: String!
-}
-
-input UpdatePermissionInput {
-  id: String!
-  name: String!
-  description: String!
-  isActive: Boolean!
-}
-
-input CreateManyPermissionsInput {
-  permissions: [CreatePermissionInput!]!
-}
-
-input DeleteManyPermissionsInput {
+input DeleteManySchoolsInput {
   ids: [String!]!
 }

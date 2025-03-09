@@ -44,6 +44,21 @@ export class PermissionController {
     }
   }
 
+  @GrpcMethod('PermissionService', 'GetManyPermissions')
+  async getManyPermissions(data: {
+    ids: string[];
+  }): Promise<{ permissions: any[]; total: number }> {
+    try {
+      return await this.permissionService.getManyPermissions(data);
+    } catch (error) {
+      if (error instanceof RpcException) throw error;
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
+        message: 'Failed to fetch permissions',
+      });
+    }
+  }
+
   @GrpcMethod('PermissionService', 'getPermission')
   async getPermission(data: { id: string }): Promise<PermissionResponse> {
     try {

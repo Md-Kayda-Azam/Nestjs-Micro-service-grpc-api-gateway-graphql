@@ -5,10 +5,10 @@ export interface SchoolResponse {
   phoneNumber: string;
   courses: string[];
   principal: string;
-  website: string | null | undefined; // undefined যোগ করা হয়েছে
+  website: string | null;
   isActive: boolean;
   staff: string[];
-  logoUrl: string | null | undefined; // undefined যোগ করা হয়েছে
+  logoUrl: string | null;
   studentCount: number;
   teacherCount: number;
   establishedYear: number;
@@ -16,17 +16,17 @@ export interface SchoolResponse {
   region: string;
   extracurricularActivities: string[];
   affiliations: string[];
-  accreditationStatus: string | null | undefined; // undefined যোগ করা হয়েছে
+  accreditationStatus: string | null;
   country: string;
   city: string;
   postalCode: string;
-  socialMediaLinks: Record<string, string> | null | undefined; // undefined যোগ করা হয়েছে
-  lastInspectionDate: string | null; // ইতিমধ্যে সঠিক
+  socialMediaLinks: Record<string, string> | null;
+  lastInspectionDate: string | null;
   totalCampusArea: number;
   numberOfBuildings: number;
   languagesOffered: string[];
   studentTeacherRatio: number;
-  schoolLogo: string | null | undefined; // undefined যোগ করা হয়েছে
+  schoolLogo: string | null;
   isOnlineLearningAvailable: boolean;
   numberOfClassrooms: number;
   schoolEvents: string[];
@@ -40,10 +40,10 @@ export interface CreateSchoolData {
   phoneNumber: string;
   courses?: string[];
   principal: string;
-  website?: string | null | undefined; // undefined যোগ করা হয়েছে
+  website?: string | null;
   isActive?: boolean;
   staff?: string[];
-  logoUrl?: string | null | undefined; // undefined যোগ করা হয়েছে
+  logoUrl?: string | null;
   studentCount?: number;
   teacherCount?: number;
   establishedYear: number;
@@ -51,17 +51,17 @@ export interface CreateSchoolData {
   region: string;
   extracurricularActivities?: string[];
   affiliations?: string[];
-  accreditationStatus?: string | null | undefined; // undefined যোগ করা হয়েছে
+  accreditationStatus?: string | null;
   country: string;
   city: string;
   postalCode: string;
-  socialMediaLinks?: Record<string, string> | null | undefined; // undefined যোগ করা হয়েছে
-  lastInspectionDate?: string | null; // ইনপুট হিসেবে স্ট্রিং আসবে
+  socialMediaLinks?: Record<string, string> | null;
+  lastInspectionDate?: string | null;
   totalCampusArea: number;
   numberOfBuildings: number;
   languagesOffered?: string[];
   studentTeacherRatio: number;
-  schoolLogo?: string | null | undefined; // undefined যোগ করা হয়েছে
+  schoolLogo?: string | null;
   isOnlineLearningAvailable?: boolean;
   numberOfClassrooms: number;
   schoolEvents?: string[];

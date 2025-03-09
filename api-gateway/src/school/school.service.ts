@@ -13,6 +13,7 @@ import {
   CreateManySchoolsOutput,
   DeleteManySchoolsInput,
   DeleteManySchoolsOutput,
+  SocialMediaLink,
 } from './entities/school.entity';
 
 @Injectable()
@@ -24,10 +25,34 @@ export class SchoolService {
       this.client.getService<SchoolGrpcService>('SchoolService');
   }
 
+  // gRPC থেকে GraphQL-এ socialMediaLinks রূপান্তর ফাংশন
+  private mapSocialMediaLinks(socialMediaLinks: {
+    [key: string]: string;
+  }): SocialMediaLink[] {
+    return Object.entries(socialMediaLinks || {}).map(([platform, url]) => ({
+      platform,
+      url,
+    }));
+  }
+
   async createSchool(data: CreateSchoolInput): Promise<School> {
     try {
+      // GraphQL থেকে gRPC-তে socialMediaLinks রূপান্তর
+      const grpcData = {
+        ...data,
+        socialMediaLinks: data.socialMediaLinks
+          ? data.socialMediaLinks.reduce(
+              (acc, link) => {
+                acc[link.platform] = link.url;
+                return acc;
+              },
+              {} as { [key: string]: string },
+            )
+          : {},
+      };
+
       const response = await lastValueFrom(
-        this.schoolGrpcService.CreateSchool(data),
+        this.schoolGrpcService.CreateSchool(grpcData),
       );
       return {
         _id: response.id,
@@ -51,7 +76,7 @@ export class SchoolService {
         country: response.country,
         city: response.city,
         postalCode: response.postalCode,
-        socialMediaLinks: response.socialMediaLinks,
+        socialMediaLinks: this.mapSocialMediaLinks(response.socialMediaLinks),
         lastInspectionDate: response.lastInspectionDate,
         totalCampusArea: response.totalCampusArea,
         numberOfBuildings: response.numberOfBuildings,
@@ -74,6 +99,13 @@ export class SchoolService {
       const response = await lastValueFrom(
         this.schoolGrpcService.GetAllSchools(data),
       );
+      if (response.total === 0) {
+        return {
+          schools: [],
+          total: 0,
+          message: 'No schools found (empty)', // কাস্টম মেসেজ
+        };
+      }
       return {
         schools: response.schools.map((school) => ({
           _id: school.id,
@@ -97,7 +129,7 @@ export class SchoolService {
           country: school.country,
           city: school.city,
           postalCode: school.postalCode,
-          socialMediaLinks: school.socialMediaLinks,
+          socialMediaLinks: this.mapSocialMediaLinks(school.socialMediaLinks),
           lastInspectionDate: school.lastInspectionDate,
           totalCampusArea: school.totalCampusArea,
           numberOfBuildings: school.numberOfBuildings,
@@ -144,7 +176,7 @@ export class SchoolService {
         country: response.country,
         city: response.city,
         postalCode: response.postalCode,
-        socialMediaLinks: response.socialMediaLinks,
+        socialMediaLinks: this.mapSocialMediaLinks(response.socialMediaLinks),
         lastInspectionDate: response.lastInspectionDate,
         totalCampusArea: response.totalCampusArea,
         numberOfBuildings: response.numberOfBuildings,
@@ -164,8 +196,22 @@ export class SchoolService {
 
   async updateSchool(data: UpdateSchoolInput): Promise<School> {
     try {
+      // GraphQL থেকে gRPC-তে socialMediaLinks রূপান্তর
+      const grpcData = {
+        ...data,
+        socialMediaLinks: data.socialMediaLinks
+          ? data.socialMediaLinks.reduce(
+              (acc, link) => {
+                acc[link.platform] = link.url;
+                return acc;
+              },
+              {} as { [key: string]: string },
+            )
+          : {},
+      };
+
       const response = await lastValueFrom(
-        this.schoolGrpcService.UpdateSchool(data),
+        this.schoolGrpcService.UpdateSchool(grpcData),
       );
       return {
         _id: response.id,
@@ -189,7 +235,7 @@ export class SchoolService {
         country: response.country,
         city: response.city,
         postalCode: response.postalCode,
-        socialMediaLinks: response.socialMediaLinks,
+        socialMediaLinks: this.mapSocialMediaLinks(response.socialMediaLinks),
         lastInspectionDate: response.lastInspectionDate,
         totalCampusArea: response.totalCampusArea,
         numberOfBuildings: response.numberOfBuildings,
@@ -225,8 +271,24 @@ export class SchoolService {
     data: CreateManySchoolsInput,
   ): Promise<CreateManySchoolsOutput> {
     try {
+      // GraphQL থেকে gRPC-তে socialMediaLinks রূপান্তর
+      const grpcData = {
+        schools: data.schools.map((school) => ({
+          ...school,
+          socialMediaLinks: school.socialMediaLinks
+            ? school.socialMediaLinks.reduce(
+                (acc, link) => {
+                  acc[link.platform] = link.url;
+                  return acc;
+                },
+                {} as { [key: string]: string },
+              )
+            : {},
+        })),
+      };
+
       const response = await lastValueFrom(
-        this.schoolGrpcService.CreateManySchools(data),
+        this.schoolGrpcService.CreateManySchools(grpcData),
       );
       return {
         schools: response.schools.map((school) => ({
@@ -251,7 +313,7 @@ export class SchoolService {
           country: school.country,
           city: school.city,
           postalCode: school.postalCode,
-          socialMediaLinks: school.socialMediaLinks,
+          socialMediaLinks: this.mapSocialMediaLinks(school.socialMediaLinks),
           lastInspectionDate: school.lastInspectionDate,
           totalCampusArea: school.totalCampusArea,
           numberOfBuildings: school.numberOfBuildings,

@@ -1,5 +1,11 @@
 import { Observable } from 'rxjs';
 
+// SocialMediaLink ইন্টারফেস (GraphQL এর জন্য)
+export interface SocialMediaLink {
+  platform: string;
+  url: string;
+}
+
 // School response type
 export interface GrpcSchoolResponse {
   id: string;
@@ -73,7 +79,7 @@ export interface CreateSchoolRequest {
 
 // Get all schools request
 export interface GetAllSchoolsRequest {
-  isActive: boolean;
+  isActive?: boolean;
   limit: number;
   offset: number;
 }
