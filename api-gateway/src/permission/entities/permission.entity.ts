@@ -1,72 +1,84 @@
-import { Field, ObjectType, InputType, Int, ID } from '@nestjs/graphql';
-import { IsString, IsEmail, IsNotEmpty } from 'class-validator';
+import { ObjectType, Field, InputType, Int } from '@nestjs/graphql';
+import {
+  IsArray,
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsString,
+} from 'class-validator';
 
 @ObjectType()
 export class Permission {
-  @Field(() => ID)
+  @Field(() => String)
   _id: string;
 
   @Field(() => String)
   name: string;
 
-  @Field(() => String, { nullable: true })
-  description?: string;
+  @Field(() => String)
+  description: string;
 
   @Field(() => Boolean)
   isActive: boolean;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   createdAt?: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   updatedAt?: string;
 }
 
 @InputType()
 export class CreatePermissionInput {
-  @Field()
+  @Field(() => String)
   @IsString()
-  @IsNotEmpty({ message: 'First name is required' })
+  @IsNotEmpty({ message: 'Name is required' })
   name: string;
 
-  @Field()
+  @Field(() => String)
   @IsString()
+  @IsNotEmpty({ message: 'Description is required' })
   description: string;
-
-  @Field()
-  @IsString()
-  isActive: boolean;
 }
 
 @InputType()
 export class UpdatePermissionInput {
   @Field(() => String)
+  @IsString()
+  @IsNotEmpty({ message: 'Id is required' })
   id: string;
 
-  @Field(() => String, { nullable: true })
-  name?: string;
+  @Field(() => String)
+  @IsString()
+  @IsNotEmpty({ message: 'Name is required' })
+  name: string;
 
-  @Field(() => String, { nullable: true })
-  description?: string;
+  @Field(() => String)
+  @IsString()
+  @IsNotEmpty({ message: 'Description is required' })
+  description: string;
 
-  @Field(() => Boolean, { nullable: true })
-  isActive?: boolean;
+  @Field(() => Boolean)
+  @IsBoolean()
+  @IsNotEmpty({ message: 'IsActive is required' })
+  isActive: boolean;
 }
 
 @InputType()
 export class GetAllPermissionsInput {
-  @Field(() => Boolean, { nullable: true })
-  isActive?: boolean;
+  @Field(() => Int)
+  @IsInt()
+  @IsNotEmpty({ message: 'Limit is required' })
+  limit: number;
 
-  @Field(() => Int, { defaultValue: 10 })
-  limit?: number;
-
-  @Field(() => Int, { defaultValue: 0 })
-  offset?: number;
+  @Field(() => Int)
+  @IsInt()
+  @IsNotEmpty({ message: 'Limit is required' })
+  offset: number;
 }
 
 @ObjectType()
-export class GetAllPermissionsResponse {
+export class GetAllPermissionsOutput {
   @Field(() => [Permission])
   permissions: Permission[];
 
@@ -75,7 +87,7 @@ export class GetAllPermissionsResponse {
 }
 
 @ObjectType()
-export class DeletePermissionResponse {
+export class DeletePermissionOutput {
   @Field(() => Boolean)
   success: boolean;
 
@@ -86,11 +98,13 @@ export class DeletePermissionResponse {
 @InputType()
 export class CreateManyPermissionsInput {
   @Field(() => [CreatePermissionInput])
+  @IsArray()
+  @IsNotEmpty({ message: 'Permissions is required' })
   permissions: CreatePermissionInput[];
 }
 
 @ObjectType()
-export class CreateManyPermissionsResponse {
+export class CreateManyPermissionsOutput {
   @Field(() => [Permission])
   permissions: Permission[];
 }
@@ -98,14 +112,25 @@ export class CreateManyPermissionsResponse {
 @InputType()
 export class DeleteManyPermissionsInput {
   @Field(() => [String])
+  @IsArray()
+  @IsNotEmpty({ message: 'Permissions ids is required' })
   ids: string[];
 }
 
 @ObjectType()
-export class DeleteManyPermissionsResponse {
+export class DeleteManyPermissionsOutput {
   @Field(() => Boolean)
   success: boolean;
 
   @Field(() => String)
   message: string;
+}
+
+@ObjectType()
+export class GetManyPermissionsResponse {
+  @Field(() => [Permission])
+  permissions: Permission[];
+
+  @Field(() => Int)
+  total: number;
 }

@@ -12,9 +12,9 @@ import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { RoleModule } from './role/role.module';
 import { SchoolModule } from './school/school.module';
-import { StudentModule } from './student/student.module';
-import { TeacherModule } from './teacher/teacher.module';
-import { ParentModule } from './parent/parent.module';
+// import { StudentModule } from './student/student.module';
+// import { TeacherModule } from './teacher/teacher.module';
+// import { ParentModule } from './parent/parent.module';
 import { PermissionModule } from './permission/permission.module';
 
 @Module({
@@ -99,8 +99,8 @@ import { PermissionModule } from './permission/permission.module';
     ]),
     UserModule,
     AuthModule,
-    PermissionModule,
-    // RoleModule,
+    // PermissionModule,
+    RoleModule,
     // SchoolModule,
     // StudentModule,
     // TeacherModule,
@@ -128,10 +128,10 @@ import { PermissionModule } from './permission/permission.module';
         },
       }),
     },
-    {
-      provide: 'APP_GUARD', // গ্লোবাল গার্ড
-      useClass: AuthGuard,
-    },
+    // {
+    //   provide: 'APP_GUARD', // গ্লোবাল গার্ড
+    //   useClass: AuthGuard,
+    // },
   ],
   exports: [ClientsModule], // Export ClientsModule to make USER_PACKAGE available
 })

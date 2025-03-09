@@ -1,35 +1,143 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { StudentService } from './student.service';
-import { Student } from './entities/student.entity';
-import { CreateStudentInput } from './dto/create-student.input';
-import { UpdateStudentInput } from './dto/update-student.input';
+import {
+  Student,
+  CreateStudentInput,
+  UpdateStudentInput,
+  GetAllStudentsInput,
+  GetAllStudentsOutput,
+  DeleteStudentOutput,
+  CreateManyStudentsInput,
+  CreateManyStudentsOutput,
+  DeleteManyStudentsInput,
+  DeleteManyStudentsOutput,
+} from './entities/student.entity';
+import { GraphQLError } from 'graphql';
 
 @Resolver(() => Student)
 export class StudentResolver {
   constructor(private readonly studentService: StudentService) {}
 
   @Mutation(() => Student)
-  createStudent(@Args('createStudentInput') createStudentInput: CreateStudentInput) {
-    return this.studentService.create(createStudentInput);
+  async createStudent(
+    @Args('createStudentInput') createStudentInput: CreateStudentInput,
+  ): Promise<Student> {
+    try {
+      return await this.studentService.createStudent(createStudentInput);
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: error.message.includes('already exists')
+            ? 'ALREADY_EXISTS'
+            : 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
   }
 
-  @Query(() => [Student], { name: 'student' })
-  findAll() {
-    return this.studentService.findAll();
+  @Query(() => GetAllStudentsOutput)
+  async getAllStudents(
+    @Args('getAllStudentsInput') getAllStudentsInput: GetAllStudentsInput,
+  ): Promise<GetAllStudentsOutput> {
+    try {
+      return await this.studentService.getAllStudents(getAllStudentsInput);
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
   }
 
-  @Query(() => Student, { name: 'student' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.studentService.findOne(id);
+  @Query(() => Student)
+  async getStudent(
+    @Args('id', { type: () => String }) id: string,
+  ): Promise<Student> {
+    try {
+      return await this.studentService.getStudent(id);
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: error.message.includes('not found')
+            ? 'NOT_FOUND'
+            : 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
   }
 
   @Mutation(() => Student)
-  updateStudent(@Args('updateStudentInput') updateStudentInput: UpdateStudentInput) {
-    return this.studentService.update(updateStudentInput.id, updateStudentInput);
+  async updateStudent(
+    @Args('updateStudentInput') updateStudentInput: UpdateStudentInput,
+  ): Promise<Student> {
+    try {
+      return await this.studentService.updateStudent(updateStudentInput);
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: error.message.includes('not found')
+            ? 'NOT_FOUND'
+            : 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
   }
 
-  @Mutation(() => Student)
-  removeStudent(@Args('id', { type: () => Int }) id: number) {
-    return this.studentService.remove(id);
+  @Mutation(() => DeleteStudentOutput)
+  async deleteStudent(
+    @Args('id', { type: () => String }) id: string,
+  ): Promise<DeleteStudentOutput> {
+    try {
+      return await this.studentService.deleteStudent(id);
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: error.message.includes('not found')
+            ? 'NOT_FOUND'
+            : 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
+  }
+
+  @Mutation(() => CreateManyStudentsOutput)
+  async createManyStudents(
+    @Args('createManyStudentsInput')
+    createManyStudentsInput: CreateManyStudentsInput,
+  ): Promise<CreateManyStudentsOutput> {
+    try {
+      return await this.studentService.createManyStudents(
+        createManyStudentsInput,
+      );
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: error.message.includes('already exists')
+            ? 'ALREADY_EXISTS'
+            : 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
+  }
+
+  @Mutation(() => DeleteManyStudentsOutput)
+  async deleteManyStudents(
+    @Args('deleteManyStudentsInput')
+    deleteManyStudentsInput: DeleteManyStudentsInput,
+  ): Promise<DeleteManyStudentsOutput> {
+    try {
+      return await this.studentService.deleteManyStudents(
+        deleteManyStudentsInput,
+      );
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: error.message.includes('not found')
+            ? 'NOT_FOUND'
+            : 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
   }
 }

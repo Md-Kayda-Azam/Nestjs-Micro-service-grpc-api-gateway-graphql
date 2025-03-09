@@ -1,35 +1,139 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { SchoolService } from './school.service';
-import { School } from './entities/school.entity';
-import { CreateSchoolInput } from './dto/create-school.input';
-import { UpdateSchoolInput } from './dto/update-school.input';
+import {
+  School,
+  CreateSchoolInput,
+  UpdateSchoolInput,
+  GetAllSchoolsInput,
+  GetAllSchoolsOutput,
+  DeleteSchoolOutput,
+  CreateManySchoolsInput,
+  CreateManySchoolsOutput,
+  DeleteManySchoolsInput,
+  DeleteManySchoolsOutput,
+} from './entities/school.entity';
+import { GraphQLError } from 'graphql';
 
 @Resolver(() => School)
 export class SchoolResolver {
   constructor(private readonly schoolService: SchoolService) {}
 
   @Mutation(() => School)
-  createSchool(@Args('createSchoolInput') createSchoolInput: CreateSchoolInput) {
-    return this.schoolService.create(createSchoolInput);
+  async createSchool(
+    @Args('createSchoolInput') createSchoolInput: CreateSchoolInput,
+  ): Promise<School> {
+    try {
+      return await this.schoolService.createSchool(createSchoolInput);
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: error.message.includes('already exists')
+            ? 'ALREADY_EXISTS'
+            : 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
   }
 
-  @Query(() => [School], { name: 'school' })
-  findAll() {
-    return this.schoolService.findAll();
+  @Query(() => GetAllSchoolsOutput)
+  async getAllSchools(
+    @Args('getAllSchoolsInput') getAllSchoolsInput: GetAllSchoolsInput,
+  ): Promise<GetAllSchoolsOutput> {
+    try {
+      return await this.schoolService.getAllSchools(getAllSchoolsInput);
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
   }
 
-  @Query(() => School, { name: 'school' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.schoolService.findOne(id);
+  @Query(() => School)
+  async getSchool(
+    @Args('id', { type: () => String }) id: string,
+  ): Promise<School> {
+    try {
+      return await this.schoolService.getSchool(id);
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: error.message.includes('not found')
+            ? 'NOT_FOUND'
+            : 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
   }
 
   @Mutation(() => School)
-  updateSchool(@Args('updateSchoolInput') updateSchoolInput: UpdateSchoolInput) {
-    return this.schoolService.update(updateSchoolInput.id, updateSchoolInput);
+  async updateSchool(
+    @Args('updateSchoolInput') updateSchoolInput: UpdateSchoolInput,
+  ): Promise<School> {
+    try {
+      return await this.schoolService.updateSchool(updateSchoolInput);
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: error.message.includes('not found')
+            ? 'NOT_FOUND'
+            : 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
   }
 
-  @Mutation(() => School)
-  removeSchool(@Args('id', { type: () => Int }) id: number) {
-    return this.schoolService.remove(id);
+  @Mutation(() => DeleteSchoolOutput)
+  async deleteSchool(
+    @Args('id', { type: () => String }) id: string,
+  ): Promise<DeleteSchoolOutput> {
+    try {
+      return await this.schoolService.deleteSchool(id);
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: error.message.includes('not found')
+            ? 'NOT_FOUND'
+            : 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
+  }
+
+  @Mutation(() => CreateManySchoolsOutput)
+  async createManySchools(
+    @Args('createManySchoolsInput')
+    createManySchoolsInput: CreateManySchoolsInput,
+  ): Promise<CreateManySchoolsOutput> {
+    try {
+      return await this.schoolService.createManySchools(createManySchoolsInput);
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: error.message.includes('already exists')
+            ? 'ALREADY_EXISTS'
+            : 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
+  }
+
+  @Mutation(() => DeleteManySchoolsOutput)
+  async deleteManySchools(
+    @Args('deleteManySchoolsInput')
+    deleteManySchoolsInput: DeleteManySchoolsInput,
+  ): Promise<DeleteManySchoolsOutput> {
+    try {
+      return await this.schoolService.deleteManySchools(deleteManySchoolsInput);
+    } catch (error) {
+      throw new GraphQLError(error.message, {
+        extensions: {
+          code: error.message.includes('not found')
+            ? 'NOT_FOUND'
+            : 'INTERNAL_SERVER_ERROR',
+        },
+      });
+    }
   }
 }

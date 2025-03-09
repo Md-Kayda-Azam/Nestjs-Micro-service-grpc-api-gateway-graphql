@@ -52,18 +52,86 @@ type LogoutResponse {
 }
 
 type Permission {
-  _id: ID!
+  _id: String!
   name: String!
-  description: String
+  description: String!
   isActive: Boolean!
   createdAt: String
   updatedAt: String
+}
+
+type GetAllPermissionsOutput {
+  permissions: [Permission!]!
+  total: Int!
+}
+
+type DeletePermissionOutput {
+  success: Boolean!
+  message: String!
+}
+
+type CreateManyPermissionsOutput {
+  permissions: [Permission!]!
+}
+
+type DeleteManyPermissionsOutput {
+  success: Boolean!
+  message: String!
+}
+
+type GetManyPermissionsResponse {
+  permissions: [Permission!]!
+  total: Int!
+}
+
+type Role {
+  _id: String!
+  name: String!
+  permissions: [Permission!]!
+  description: String!
+  isActive: Boolean!
+  createdAt: String
+  updatedAt: String
+}
+
+type GetAllRolesOutput {
+  roles: [Role!]!
+  total: Int!
+}
+
+type DeleteRoleOutput {
+  success: Boolean!
+  message: String!
+}
+
+type CreateManyRolesOutput {
+  roles: [Role!]!
+}
+
+type DeleteManyRolesOutput {
+  success: Boolean!
+  message: String!
 }
 
 type Query {
   users: [User!]!
   user(email: String!): User!
   me: User!
+  getAllRoles(getAllRolesInput: GetAllRolesInput!): GetAllRolesOutput!
+  getRole(id: String!): Role!
+  getAllPermissions(getAllPermissionsInput: GetAllPermissionsInput!): GetAllPermissionsOutput!
+  getPermission(id: String!): Permission!
+  getManyPermissions(ids: [String!]!): GetManyPermissionsResponse!
+}
+
+input GetAllRolesInput {
+  limit: Int!
+  offset: Int!
+}
+
+input GetAllPermissionsInput {
+  limit: Int!
+  offset: Int!
 }
 
 type Mutation {
@@ -74,7 +142,16 @@ type Mutation {
   resendVerification(input: resendVerificationInput!): ResponseMessage!
   login(input: loginInput!): User!
   logout: LogoutResponse!
+  createRole(createRoleInput: CreateRoleInput!): Role!
+  updateRole(updateRoleInput: UpdateRoleInput!): Role!
+  deleteRole(id: String!): DeleteRoleOutput!
+  createManyRoles(createManyRolesInput: CreateManyRolesInput!): CreateManyRolesOutput!
+  deleteManyRoles(deleteManyRolesInput: DeleteManyRolesInput!): DeleteManyRolesOutput!
   createPermission(createPermissionInput: CreatePermissionInput!): Permission!
+  updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
+  deletePermission(id: String!): DeletePermissionOutput!
+  createManyPermissions(createManyPermissionsInput: CreateManyPermissionsInput!): CreateManyPermissionsOutput!
+  deleteManyPermissions(deleteManyPermissionsInput: DeleteManyPermissionsInput!): DeleteManyPermissionsOutput!
 }
 
 input CreateUserInput {
@@ -113,8 +190,44 @@ input loginInput {
   password: String!
 }
 
+input CreateRoleInput {
+  name: String!
+  permissionIds: [String!]!
+  description: String!
+}
+
+input UpdateRoleInput {
+  id: String!
+  name: String!
+  permissionIds: [String!]!
+  description: String!
+  isActive: Boolean!
+}
+
+input CreateManyRolesInput {
+  roles: [CreateRoleInput!]!
+}
+
+input DeleteManyRolesInput {
+  ids: [String!]!
+}
+
 input CreatePermissionInput {
   name: String!
   description: String!
+}
+
+input UpdatePermissionInput {
+  id: String!
+  name: String!
+  description: String!
   isActive: Boolean!
+}
+
+input CreateManyPermissionsInput {
+  permissions: [CreatePermissionInput!]!
+}
+
+input DeleteManyPermissionsInput {
+  ids: [String!]!
 }
