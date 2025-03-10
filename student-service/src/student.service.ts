@@ -2,7 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { StudentDocument, Student } from './schema/student.schema';
-import { CreateStudentData, StudentResponse } from './types/studentTypes';
+import {
+  CreateStudentData,
+  StudentResponse,
+  GetAllStudentsRequest,
+  GetAllStudentsResponse,
+  GetStudentRequest,
+  UpdateStudentRequest,
+  DeleteStudentRequest,
+  DeleteStudentResponse,
+  CreateManyStudentsRequest,
+  CreateManyStudentsResponse,
+  DeleteManyStudentsRequest,
+  DeleteManyStudentsResponse,
+  GradeEntry,
+} from './types/studentTypes';
 import { RpcException } from '@nestjs/microservices';
 import * as grpc from '@grpc/grpc-js';
 
@@ -12,6 +26,19 @@ export class StudentService {
     @InjectModel(Student.name)
     private studentModel: Model<StudentDocument>,
   ) {}
+
+  // Helper method to convert GradeEntry[] to Map<string, number>
+  private gradesToMap(grades: GradeEntry[]): Map<string, number> {
+    return new Map(grades.map((entry) => [entry.courseId, entry.grade]));
+  }
+
+  // Helper method to convert Map<string, number> to GradeEntry[]
+  private mapToGrades(gradesMap: Map<string, number>): GradeEntry[] {
+    return Array.from(gradesMap.entries()).map(([courseId, grade]) => ({
+      courseId,
+      grade,
+    }));
+  }
 
   async createStudent(data: CreateStudentData): Promise<StudentResponse> {
     const existingStudent = await this.studentModel
@@ -36,9 +63,9 @@ export class StudentService {
       enrollmentDate: new Date(data.enrollmentDate),
       classId: data.classId,
       enrolledCourses: data.enrolledCourses || [],
-      grades: data.grades || new Map(),
+      grades: data.grades ? this.gradesToMap(data.grades) : new Map(),
       extracurricularActivities: data.extracurricularActivities || [],
-      parentId: data.parentId || null,
+      parentId: data.parentId,
       nationality: data.nationality,
       graduationDate: data.graduationDate
         ? new Date(data.graduationDate)
@@ -66,7 +93,7 @@ export class StudentService {
       enrollmentDate: savedStudent.enrollmentDate.toISOString(),
       classId: savedStudent.classId,
       enrolledCourses: savedStudent.enrolledCourses,
-      grades: Object.fromEntries(savedStudent.grades),
+      grades: this.mapToGrades(savedStudent.grades),
       extracurricularActivities: savedStudent.extracurricularActivities,
       parentId: savedStudent.parentId,
       nationality: savedStudent.nationality,
@@ -83,14 +110,11 @@ export class StudentService {
     };
   }
 
-  async getAllStudents(data: {
-    isActive?: boolean;
-    limit?: number;
-    offset?: number;
-  }): Promise<{ students: StudentResponse[]; total: number }> {
+  async getAllStudents(
+    data: GetAllStudentsRequest,
+  ): Promise<GetAllStudentsResponse> {
     try {
       const filter: any = {};
-      // isActive ফিল্টার স্কিমায় নেই, তবে জেনেরিক ফিল্টার হিসেবে ব্যবহার করা যেতে পারে
       const limit = data.limit ? Math.min(data.limit, 100) : 10;
       const offset = data.offset || 0;
 
@@ -115,7 +139,7 @@ export class StudentService {
           enrollmentDate: s.enrollmentDate.toISOString(),
           classId: s.classId,
           enrolledCourses: s.enrolledCourses,
-          grades: Object.fromEntries(s.grades),
+          grades: this.mapToGrades(s.grades),
           extracurricularActivities: s.extracurricularActivities,
           parentId: s.parentId,
           nationality: s.nationality,
@@ -140,7 +164,7 @@ export class StudentService {
     }
   }
 
-  async getStudent(data: { id: string }): Promise<StudentResponse> {
+  async getStudent(data: GetStudentRequest): Promise<StudentResponse> {
     try {
       const student = await this.studentModel.findById(data.id).exec();
       if (!student) {
@@ -163,7 +187,7 @@ export class StudentService {
         enrollmentDate: student.enrollmentDate.toISOString(),
         classId: student.classId,
         enrolledCourses: student.enrolledCourses,
-        grades: Object.fromEntries(student.grades),
+        grades: this.mapToGrades(student.grades),
         extracurricularActivities: student.extracurricularActivities,
         parentId: student.parentId,
         nationality: student.nationality,
@@ -186,9 +210,7 @@ export class StudentService {
     }
   }
 
-  async updateStudent(
-    data: { id: string } & Partial<CreateStudentData>,
-  ): Promise<StudentResponse> {
+  async updateStudent(data: UpdateStudentRequest): Promise<StudentResponse> {
     try {
       const updateData: Partial<Student> = {
         schoolId: data.schoolId,
@@ -198,7 +220,7 @@ export class StudentService {
         studentID: data.studentID,
         email: data.email,
         phoneNumber: data.phoneNumber,
-        address: data.address ? data.address : undefined,
+        address: data.address,
         admissionDate: data.admissionDate
           ? new Date(data.admissionDate)
           : undefined,
@@ -207,19 +229,17 @@ export class StudentService {
           : undefined,
         classId: data.classId,
         enrolledCourses: data.enrolledCourses,
-        grades: data.grades ? new Map(Object.entries(data.grades)) : undefined,
+        grades: data.grades ? this.gradesToMap(data.grades) : undefined,
         extracurricularActivities: data.extracurricularActivities,
         nationality: data.nationality,
         graduationDate: data.graduationDate
           ? new Date(data.graduationDate)
           : undefined,
-        profilePictureUrl: data.profilePictureUrl
-          ? data.profilePictureUrl
-          : undefined,
+        profilePictureUrl: data.profilePictureUrl,
         awards: data.awards,
-        healthDetails: data.healthDetails ? data.healthDetails : undefined,
+        healthDetails: data.healthDetails,
         isSpecialNeeds: data.isSpecialNeeds,
-        remarks: data.remarks ? data.remarks : undefined,
+        remarks: data.remarks,
       };
 
       const student = await this.studentModel
@@ -245,7 +265,7 @@ export class StudentService {
         enrollmentDate: student.enrollmentDate.toISOString(),
         classId: student.classId,
         enrolledCourses: student.enrolledCourses,
-        grades: Object.fromEntries(student.grades),
+        grades: this.mapToGrades(student.grades),
         extracurricularActivities: student.extracurricularActivities,
         parentId: student.parentId,
         nationality: student.nationality,
@@ -268,9 +288,9 @@ export class StudentService {
     }
   }
 
-  async deleteStudent(data: {
-    id: string;
-  }): Promise<{ success: boolean; message: string }> {
+  async deleteStudent(
+    data: DeleteStudentRequest,
+  ): Promise<DeleteStudentResponse> {
     try {
       const result = await this.studentModel.findByIdAndDelete(data.id).exec();
       if (!result) {
@@ -292,9 +312,9 @@ export class StudentService {
     }
   }
 
-  async createManyStudents(data: {
-    students: CreateStudentData[];
-  }): Promise<{ students: StudentResponse[] }> {
+  async createManyStudents(
+    data: CreateManyStudentsRequest,
+  ): Promise<CreateManyStudentsResponse> {
     try {
       const studentsToCreate = data.students.map((s) => ({
         schoolId: s.schoolId,
@@ -308,7 +328,7 @@ export class StudentService {
         enrollmentDate: new Date(s.enrollmentDate),
         classId: s.classId,
         enrolledCourses: s.enrolledCourses || [],
-        grades: s.grades ? new Map(Object.entries(s.grades)) : new Map(),
+        grades: s.grades ? this.gradesToMap(s.grades) : new Map(),
         extracurricularActivities: s.extracurricularActivities || [],
         parentId: s.parentId,
         nationality: s.nationality,
@@ -338,7 +358,7 @@ export class StudentService {
           enrollmentDate: s.enrollmentDate.toISOString(),
           classId: s.classId,
           enrolledCourses: s.enrolledCourses,
-          grades: Object.fromEntries(s.grades),
+          grades: this.mapToGrades(s.grades),
           extracurricularActivities: s.extracurricularActivities,
           parentId: s.parentId,
           nationality: s.nationality,
@@ -362,9 +382,9 @@ export class StudentService {
     }
   }
 
-  async deleteManyStudents(data: {
-    ids: string[];
-  }): Promise<{ success: boolean; message: string }> {
+  async deleteManyStudents(
+    data: DeleteManyStudentsRequest,
+  ): Promise<DeleteManyStudentsResponse> {
     try {
       const result = await this.studentModel
         .deleteMany({ _id: { $in: data.ids } })

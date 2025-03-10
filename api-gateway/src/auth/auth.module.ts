@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
+import { RoleModule } from 'src/role/role.module';
 // import { AuthGuard } from './guards/auth.guard';
 
 @Module({
@@ -18,6 +19,7 @@ import { join } from 'path';
         },
       },
     ]),
+    RoleModule,
   ],
   providers: [AuthResolver, AuthService],
   exports: [AuthService],

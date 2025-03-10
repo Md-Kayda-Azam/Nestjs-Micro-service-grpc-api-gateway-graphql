@@ -6,8 +6,14 @@ import {
   IsString,
   IsOptional,
   IsNumber,
+  Matches,
 } from 'class-validator';
+import {
+  SocialMediaLinks,
+  SocialMediaLinksInput,
+} from './social-media-links.entity';
 
+// ObjectType for Teacher (output)
 @ObjectType()
 export class Teacher {
   @Field(() => String)
@@ -17,9 +23,15 @@ export class Teacher {
   schoolId: string;
 
   @Field(() => String)
+  @IsString()
+  @Matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: 'Invalid email format' })
+  @IsNotEmpty({ message: 'Email is required' })
   email: string;
 
   @Field(() => String)
+  @IsString()
+  @Matches(/^\+?[\d\s-]{10,}$/, { message: 'Invalid phone number format' })
+  @IsNotEmpty({ message: 'Phone number is required' })
   phoneNumber: string;
 
   @Field(() => String)
@@ -49,8 +61,8 @@ export class Teacher {
   @Field(() => String)
   nationality: string;
 
-  @Field(() => Object, { nullable: true })
-  socialMediaLinks: { [key: string]: string };
+  @Field(() => SocialMediaLinks, { nullable: true }) // Use SocialMediaLinks for output
+  socialMediaLinks: SocialMediaLinks;
 
   @Field(() => String)
   emergencyContact: string;
@@ -77,6 +89,7 @@ export class Teacher {
   updatedAt?: string;
 }
 
+// InputType for CreateTeacherInput
 @InputType()
 export class CreateTeacherInput {
   @Field(() => String)
@@ -139,9 +152,9 @@ export class CreateTeacherInput {
   @IsNotEmpty({ message: 'Nationality is required' })
   nationality: string;
 
-  @Field(() => Object, { nullable: true })
+  @Field(() => SocialMediaLinksInput, { nullable: true }) // Use SocialMediaLinksInput for input
   @IsOptional()
-  socialMediaLinks: { [key: string]: string };
+  socialMediaLinks: SocialMediaLinksInput;
 
   @Field(() => String)
   @IsString()
@@ -174,6 +187,7 @@ export class CreateTeacherInput {
   studentCount: number;
 }
 
+// InputType for UpdateTeacherInput
 @InputType()
 export class UpdateTeacherInput {
   @Field(() => String)
@@ -241,9 +255,9 @@ export class UpdateTeacherInput {
   @IsNotEmpty({ message: 'Nationality is required' })
   nationality: string;
 
-  @Field(() => Object, { nullable: true })
+  @Field(() => SocialMediaLinksInput, { nullable: true }) // Use SocialMediaLinksInput for input
   @IsOptional()
-  socialMediaLinks: { [key: string]: string };
+  socialMediaLinks: SocialMediaLinksInput;
 
   @Field(() => String)
   @IsString()
@@ -276,6 +290,7 @@ export class UpdateTeacherInput {
   studentCount: number;
 }
 
+// Rest of the file remains the same
 @InputType()
 export class GetAllTeachersInput {
   @Field(() => String)

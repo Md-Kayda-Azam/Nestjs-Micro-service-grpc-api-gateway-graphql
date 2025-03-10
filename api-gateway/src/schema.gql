@@ -41,6 +41,68 @@ type User {
   updatedAt: String
 }
 
+type Permission {
+  _id: String!
+  name: String!
+  description: String!
+  isActive: Boolean!
+  createdAt: String
+  updatedAt: String
+}
+
+type GetAllPermissionsOutput {
+  permissions: [Permission!]!
+  total: Int!
+}
+
+type DeletePermissionOutput {
+  success: Boolean!
+  message: String!
+}
+
+type CreateManyPermissionsOutput {
+  permissions: [Permission!]!
+}
+
+type DeleteManyPermissionsOutput {
+  success: Boolean!
+  message: String!
+}
+
+type GetManyPermissionsResponse {
+  permissions: [Permission!]!
+  total: Int!
+}
+
+type Role {
+  _id: String!
+  name: String!
+  permissions: [Permission!]!
+  description: String!
+  isActive: Boolean!
+  createdAt: String
+  updatedAt: String
+}
+
+type GetAllRolesOutput {
+  roles: [Role!]!
+  total: Int!
+}
+
+type DeleteRoleOutput {
+  success: Boolean!
+  message: String!
+}
+
+type CreateManyRolesOutput {
+  roles: [Role!]!
+}
+
+type DeleteManyRolesOutput {
+  success: Boolean!
+  message: String!
+}
+
 type ResponseMessage {
   message: String!
   code: String
@@ -112,6 +174,144 @@ type DeleteManySchoolsOutput {
   message: String!
 }
 
+type Student {
+  _id: String!
+  schoolId: String!
+  dateOfBirth: String!
+  gender: String!
+  studentID: String!
+  email: String!
+  phoneNumber: String!
+  address: String!
+  admissionDate: String!
+  enrollmentDate: String!
+  classId: String!
+  enrolledCourses: [String!]!
+  grades: [GradeEntry!]
+  extracurricularActivities: [String!]!
+  parentId: String!
+  nationality: String!
+  graduationDate: String!
+  profilePictureUrl: String!
+  awards: [String!]!
+  healthDetails: String!
+  isSpecialNeeds: Boolean!
+  remarks: String!
+  createdAt: String
+  updatedAt: String
+}
+
+type GradeEntry {
+  courseId: String!
+  grade: Float!
+}
+
+type GetAllStudentsOutput {
+  students: [Student!]!
+  total: Int!
+}
+
+type DeleteStudentOutput {
+  success: Boolean!
+  message: String!
+}
+
+type CreateManyStudentsOutput {
+  students: [Student!]!
+}
+
+type DeleteManyStudentsOutput {
+  success: Boolean!
+  message: String!
+}
+
+type SocialMediaLinks {
+  facebook: String
+  twitter: String
+  linkedin: String
+  instagram: String
+}
+
+type Teacher {
+  _id: String!
+  schoolId: String!
+  email: String!
+  phoneNumber: String!
+  address: String!
+  subject: String!
+  qualifications: [String!]!
+  hireDate: String!
+  profilePictureUrl: String!
+  status: String!
+  dateOfBirth: String!
+  gender: String!
+  nationality: String!
+  socialMediaLinks: SocialMediaLinks
+  emergencyContact: String!
+  salary: Float!
+  teachingExperienceYears: Int!
+  assignedClasses: [String!]!
+  assignedSubjects: [String!]!
+  studentCount: Int!
+  createdAt: String
+  updatedAt: String
+}
+
+type GetAllTeachersOutput {
+  teachers: [Teacher!]!
+  total: Int!
+}
+
+type DeleteTeacherOutput {
+  success: Boolean!
+  message: String!
+}
+
+type CreateManyTeachersOutput {
+  teachers: [Teacher!]!
+}
+
+type DeleteManyTeachersOutput {
+  success: Boolean!
+  message: String!
+}
+
+type Parent {
+  _id: String!
+  schoolId: String!
+  relationshipToStudent: String!
+  phoneNumber: String!
+  email: String!
+  address: String!
+  occupation: String!
+  emergencyContacts: [String!]!
+  profilePictureUrl: String!
+  associatedStudents: [String!]!
+  isPrimaryGuardian: Boolean!
+  notes: String!
+  createdAt: String
+  updatedAt: String
+}
+
+type GetAllParentsOutput {
+  parents: [Parent!]!
+  total: Int!
+}
+
+type DeleteParentOutput {
+  success: Boolean!
+  message: String!
+}
+
+type CreateManyParentsOutput {
+  parents: [Parent!]!
+}
+
+type DeleteManyParentsOutput {
+  success: Boolean!
+  message: String!
+}
+
 input SocialMediaLinkInput {
   platform: String!
   url: String!
@@ -120,9 +320,30 @@ input SocialMediaLinkInput {
 type Query {
   users: [User!]!
   user(email: String!): User!
+  getAllRoles(getAllRolesInput: GetAllRolesInput!): GetAllRolesOutput!
+  getRole(id: String!): Role!
+  getAllPermissions(getAllPermissionsInput: GetAllPermissionsInput!): GetAllPermissionsOutput!
+  getPermission(id: String!): Permission!
+  getManyPermissions(ids: [String!]!): GetManyPermissionsResponse!
   me: User!
   getAllSchools(getAllSchoolsInput: GetAllSchoolsInput!): GetAllSchoolsOutput!
   getSchool(id: String!): School!
+  getAllStudents(getAllStudentsInput: GetAllStudentsInput!): GetAllStudentsOutput!
+  getStudent(id: String!): Student!
+  getAllTeachers(getAllTeachersInput: GetAllTeachersInput!): GetAllTeachersOutput!
+  getTeacher(id: String!): Teacher!
+  getAllParents(getAllParentsInput: GetAllParentsInput!): GetAllParentsOutput!
+  getParent(id: String!): Parent!
+}
+
+input GetAllRolesInput {
+  limit: Int!
+  offset: Int!
+}
+
+input GetAllPermissionsInput {
+  limit: Int!
+  offset: Int!
 }
 
 input GetAllSchoolsInput {
@@ -131,10 +352,38 @@ input GetAllSchoolsInput {
   offset: Int!
 }
 
+input GetAllStudentsInput {
+  isActive: Boolean!
+  limit: Int!
+  offset: Int!
+}
+
+input GetAllTeachersInput {
+  status: String!
+  limit: Int!
+  offset: Int!
+}
+
+input GetAllParentsInput {
+  schoolId: String!
+  limit: Int!
+  offset: Int!
+}
+
 type Mutation {
   createUser(input: CreateUserInput!): User!
   updateUser(input: UpdateUserInput!): User!
   deleteUser(id: String!): Boolean!
+  createRole(createRoleInput: CreateRoleInput!): Role!
+  updateRole(updateRoleInput: UpdateRoleInput!): Role!
+  deleteRole(id: String!): DeleteRoleOutput!
+  createManyRoles(createManyRolesInput: CreateManyRolesInput!): CreateManyRolesOutput!
+  deleteManyRoles(deleteManyRolesInput: DeleteManyRolesInput!): DeleteManyRolesOutput!
+  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
+  updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
+  deletePermission(id: String!): DeletePermissionOutput!
+  createManyPermissions(createManyPermissionsInput: CreateManyPermissionsInput!): CreateManyPermissionsOutput!
+  deleteManyPermissions(deleteManyPermissionsInput: DeleteManyPermissionsInput!): DeleteManyPermissionsOutput!
   verifyAccount(input: verifyAccountInput!): User!
   resendVerification(input: resendVerificationInput!): ResponseMessage!
   login(input: loginInput!): User!
@@ -144,6 +393,21 @@ type Mutation {
   deleteSchool(id: String!): DeleteSchoolOutput!
   createManySchools(createManySchoolsInput: CreateManySchoolsInput!): CreateManySchoolsOutput!
   deleteManySchools(deleteManySchoolsInput: DeleteManySchoolsInput!): DeleteManySchoolsOutput!
+  createStudent(createStudentInput: CreateStudentInput!): Student!
+  updateStudent(updateStudentInput: UpdateStudentInput!): Student!
+  deleteStudent(id: String!): DeleteStudentOutput!
+  createManyStudents(createManyStudentsInput: CreateManyStudentsInput!): CreateManyStudentsOutput!
+  deleteManyStudents(deleteManyStudentsInput: DeleteManyStudentsInput!): DeleteManyStudentsOutput!
+  createTeacher(createTeacherInput: CreateTeacherInput!): Teacher!
+  updateTeacher(updateTeacherInput: UpdateTeacherInput!): Teacher!
+  deleteTeacher(id: String!): DeleteTeacherOutput!
+  createManyTeachers(createManyTeachersInput: CreateManyTeachersInput!): CreateManyTeachersOutput!
+  deleteManyTeachers(deleteManyTeachersInput: DeleteManyTeachersInput!): DeleteManyTeachersOutput!
+  createParent(createParentInput: CreateParentInput!): Parent!
+  updateParent(updateParentInput: UpdateParentInput!): Parent!
+  deleteParent(id: String!): DeleteParentOutput!
+  createManyParents(createManyParentsInput: CreateManyParentsInput!): CreateManyParentsOutput!
+  deleteManyParents(deleteManyParentsInput: DeleteManyParentsInput!): DeleteManyParentsOutput!
 }
 
 input CreateUserInput {
@@ -166,6 +430,48 @@ input UpdateUserInput {
   mfaEnabled: Boolean
   isVerified: Boolean
   refreshToken: String
+}
+
+input CreateRoleInput {
+  name: String!
+  permissionIds: [String!]!
+  description: String!
+}
+
+input UpdateRoleInput {
+  id: String!
+  name: String!
+  permissionIds: [String!]!
+  description: String!
+  isActive: Boolean!
+}
+
+input CreateManyRolesInput {
+  roles: [CreateRoleInput!]!
+}
+
+input DeleteManyRolesInput {
+  ids: [String!]!
+}
+
+input CreatePermissionInput {
+  name: String!
+  description: String!
+}
+
+input UpdatePermissionInput {
+  id: String!
+  name: String!
+  description: String!
+  isActive: Boolean!
+}
+
+input CreateManyPermissionsInput {
+  permissions: [CreatePermissionInput!]!
+}
+
+input DeleteManyPermissionsInput {
+  ids: [String!]!
 }
 
 input verifyAccountInput {
@@ -254,5 +560,164 @@ input CreateManySchoolsInput {
 }
 
 input DeleteManySchoolsInput {
+  ids: [String!]!
+}
+
+input CreateStudentInput {
+  schoolId: String!
+  dateOfBirth: String!
+  gender: String!
+  studentID: String!
+  email: String!
+  phoneNumber: String!
+  address: String!
+  admissionDate: String!
+  enrollmentDate: String!
+  classId: String!
+  enrolledCourses: [String!]!
+  grades: [GradeEntryInput!]
+  extracurricularActivities: [String!]!
+  parentId: String!
+  nationality: String!
+  graduationDate: String!
+  profilePictureUrl: String!
+  awards: [String!]!
+  healthDetails: String!
+  isSpecialNeeds: Boolean!
+  remarks: String!
+}
+
+input GradeEntryInput {
+  courseId: String!
+  grade: Int!
+}
+
+input UpdateStudentInput {
+  id: String!
+  schoolId: String!
+  dateOfBirth: String!
+  gender: String!
+  studentID: String!
+  email: String!
+  phoneNumber: String!
+  address: String!
+  admissionDate: String!
+  enrollmentDate: String!
+  classId: String!
+  enrolledCourses: [String!]!
+  grades: [GradeEntryInput!]
+  extracurricularActivities: [String!]!
+  parentId: String!
+  nationality: String!
+  graduationDate: String!
+  profilePictureUrl: String!
+  awards: [String!]!
+  healthDetails: String!
+  isSpecialNeeds: Boolean!
+  remarks: String!
+}
+
+input CreateManyStudentsInput {
+  students: [CreateStudentInput!]!
+}
+
+input DeleteManyStudentsInput {
+  ids: [String!]!
+}
+
+input CreateTeacherInput {
+  schoolId: String!
+  email: String!
+  phoneNumber: String!
+  address: String!
+  subject: String!
+  qualifications: [String!]!
+  hireDate: String!
+  profilePictureUrl: String!
+  status: String!
+  dateOfBirth: String!
+  gender: String!
+  nationality: String!
+  socialMediaLinks: SocialMediaLinksInput
+  emergencyContact: String!
+  salary: Float!
+  teachingExperienceYears: Int!
+  assignedClasses: [String!]!
+  assignedSubjects: [String!]!
+  studentCount: Int!
+}
+
+input SocialMediaLinksInput {
+  facebook: String
+  twitter: String
+  linkedin: String
+  instagram: String
+}
+
+input UpdateTeacherInput {
+  id: String!
+  schoolId: String!
+  email: String!
+  phoneNumber: String!
+  address: String!
+  subject: String!
+  qualifications: [String!]!
+  hireDate: String!
+  profilePictureUrl: String!
+  status: String!
+  dateOfBirth: String!
+  gender: String!
+  nationality: String!
+  socialMediaLinks: SocialMediaLinksInput
+  emergencyContact: String!
+  salary: Float!
+  teachingExperienceYears: Int!
+  assignedClasses: [String!]!
+  assignedSubjects: [String!]!
+  studentCount: Int!
+}
+
+input CreateManyTeachersInput {
+  teachers: [CreateTeacherInput!]!
+}
+
+input DeleteManyTeachersInput {
+  ids: [String!]!
+}
+
+input CreateParentInput {
+  schoolId: String!
+  relationshipToStudent: String!
+  phoneNumber: String!
+  email: String!
+  address: String!
+  occupation: String!
+  emergencyContacts: [String!]!
+  profilePictureUrl: String!
+  associatedStudents: [String!]!
+  isPrimaryGuardian: Boolean!
+  notes: String!
+}
+
+input UpdateParentInput {
+  id: String!
+  schoolId: String!
+  relationshipToStudent: String!
+  phoneNumber: String!
+  email: String!
+  address: String!
+  occupation: String!
+  emergencyContacts: [String!]!
+  profilePictureUrl: String!
+  associatedStudents: [String!]!
+  isPrimaryGuardian: Boolean!
+  notes: String!
+}
+
+input CreateManyParentsInput {
+  parents: [CreateParentInput!]!
+}
+
+input DeleteManyParentsInput {
   ids: [String!]!
 }

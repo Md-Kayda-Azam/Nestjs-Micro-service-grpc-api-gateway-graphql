@@ -1,4 +1,4 @@
-import { ObjectType, Field, InputType, Int } from '@nestjs/graphql';
+import { ObjectType, Field, InputType, Int, Float } from '@nestjs/graphql';
 import {
   IsArray,
   IsBoolean,
@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsString,
   IsOptional,
+  IsNumber,
 } from 'class-validator';
 
 @ObjectType()
@@ -41,19 +42,19 @@ export class Student {
   enrollmentDate: string;
 
   @Field(() => String)
-  classID: string;
+  classId: string;
 
   @Field(() => [String])
   enrolledCourses: string[];
 
-  @Field(() => Object, { nullable: true })
-  grades: { [key: string]: number };
+  @Field(() => [GradeEntry], { nullable: true })
+  grades: GradeEntry[];
 
   @Field(() => [String])
   extracurricularActivities: string[];
 
   @Field(() => String)
-  parentID: string;
+  parentId: string;
 
   @Field(() => String)
   nationality: string;
@@ -83,6 +84,27 @@ export class Student {
   updatedAt?: string;
 }
 
+@ObjectType()
+export class GradeEntry {
+  @Field(() => String)
+  @IsString()
+  courseId: string;
+
+  @Field(() => Float)
+  @IsNumber()
+  grade: number;
+}
+
+@InputType()
+export class GradeEntryInput {
+  @Field(() => String)
+  @IsString()
+  courseId: string;
+
+  @Field(() => Int)
+  @IsNumber()
+  grade: number;
+}
 @InputType()
 export class CreateStudentInput {
   @Field(() => String)
@@ -133,16 +155,16 @@ export class CreateStudentInput {
   @Field(() => String)
   @IsString()
   @IsNotEmpty({ message: 'Class ID is required' })
-  classID: string;
+  classId: string;
 
   @Field(() => [String])
   @IsArray()
   @IsNotEmpty({ message: 'Enrolled courses are required' })
   enrolledCourses: string[];
 
-  @Field(() => Object, { nullable: true })
+  @Field(() => [GradeEntryInput], { nullable: true })
   @IsOptional()
-  grades: { [key: string]: number };
+  grades: GradeEntryInput[];
 
   @Field(() => [String])
   @IsArray()
@@ -152,7 +174,7 @@ export class CreateStudentInput {
   @Field(() => String)
   @IsString()
   @IsNotEmpty({ message: 'Parent ID is required' })
-  parentID: string;
+  parentId: string;
 
   @Field(() => String)
   @IsString()
@@ -245,16 +267,16 @@ export class UpdateStudentInput {
   @Field(() => String)
   @IsString()
   @IsNotEmpty({ message: 'Class ID is required' })
-  classID: string;
+  classId: string;
 
   @Field(() => [String])
   @IsArray()
   @IsNotEmpty({ message: 'Enrolled courses are required' })
   enrolledCourses: string[];
 
-  @Field(() => Object, { nullable: true })
+  @Field(() => [GradeEntryInput], { nullable: true })
   @IsOptional()
-  grades: { [key: string]: number };
+  grades: GradeEntryInput[];
 
   @Field(() => [String])
   @IsArray()
@@ -264,7 +286,7 @@ export class UpdateStudentInput {
   @Field(() => String)
   @IsString()
   @IsNotEmpty({ message: 'Parent ID is required' })
-  parentID: string;
+  parentId: string;
 
   @Field(() => String)
   @IsString()

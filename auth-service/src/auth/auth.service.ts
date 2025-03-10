@@ -1,33 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Device, User, UserDocument } from './schema/user.schema';
+import { Device, User, UserDocument } from '../schema/user.schema';
 import { Model } from 'mongoose';
 import * as grpc from '@grpc/grpc-js';
 import { RpcException } from '@nestjs/microservices';
-import { HashPassword } from './utils/VerificationPassword'; // ধরে নিচ্ছি এটা আছে
+import { HashPassword } from '../utils/VerificationPassword'; // ধরে নিচ্ছি এটা আছে
 import { randomBytes } from 'crypto';
-import { checkRateLimit } from './helper/checkRateLimit';
+import { checkRateLimit } from '../helper/checkRateLimit';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import {
   LoginData,
+  LoginResponse,
   LogoutData,
   RefreshTokenData,
   RequestPasswordResetData,
   ResetPasswordData,
   VerifyAccountData,
-} from './types/authTypes';
+} from '../types/authTypes';
 import {
   sendResetEmail,
   sendSecurityAlertEmail,
   sendVerificationEmail,
-} from './utils/VerificationEmail';
-import { IpAddressGet } from './api/IpAddressGet';
-import { generateDeviceId } from './utils/generateDeviceId';
+} from '../utils/VerificationEmail';
+import { IpAddressGet } from '../api/IpAddressGet';
+import { generateDeviceId } from '../utils/generateDeviceId';
+import { Role, RoleDocument } from '../schema/role.schema';
+import { Permission, PermissionDocument } from '../schema/permission.schema';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private authModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private authModel: Model<UserDocument>,
+    @InjectModel(Role.name) private roleModel: Model<RoleDocument>, // সঠিকভাবে ইনজেক্ট
+    @InjectModel(Permission.name)
+    private permissionModel: Model<PermissionDocument>, // সঠিকভাবে ইনজেক্ট
+  ) {}
 
   getHello(): string {
     return 'Hello World!';
@@ -159,9 +167,144 @@ export class AuthService {
   }
 
   // Login
-  async login(data: LoginData): Promise<any> {
-    const user = await this.authModel.findOne({ email: data.email }).exec();
+  // async login(data: LoginData): Promise<any> {
+  //   const user = await this.authModel.findOne({ email: data.email }).exec();
 
+  //   if (!user) {
+  //     throw new RpcException({
+  //       code: grpc.status.NOT_FOUND,
+  //       message: 'Email not found. Please provide a registered email address.',
+  //     });
+  //   }
+
+  //   if (!user.isVerified) {
+  //     throw new RpcException({
+  //       code: grpc.status.FAILED_PRECONDITION,
+  //       message: 'Account not verified. Verify your email to proceed.',
+  //     });
+  //   }
+
+  //   if (
+  //     !user.password ||
+  //     !(await bcrypt.compare(data.password, user.password))
+  //   ) {
+  //     throw new RpcException({
+  //       code: grpc.status.UNAUTHENTICATED,
+  //       message: 'Invalid credentials. Check your email and password.',
+  //     });
+  //   }
+
+  //   const userAgent = data.userAgent;
+  //   const ipData = await IpAddressGet(); // ধরে নিচ্ছি এটা একটা ফাংশন যা IP ডাটা রিটার্ন করে
+  //   const ipAddress = ipData.ip;
+  //   const location = `${ipData.city}, ${ipData.country}`;
+  //   const deviceId = generateDeviceId(ipAddress, 'userAgent', 'en-US');
+
+  //   // 3. ডিভাইস ম্যানেজমেন্ট
+  //   user.devices = user.devices || []; // নিশ্চিত করা যে devices অ্যারে আছে
+  //   const existingDevice = user.devices.find(
+  //     (d: Device) => d.deviceId === deviceId,
+  //   );
+
+  //   if (!existingDevice) {
+  //     const newDevice: Device = {
+  //       deviceId,
+  //       ipAddress,
+  //       userAgent,
+  //       location,
+  //     };
+  //     user.devices.push(newDevice);
+
+  //     // সিকিউরিটি অ্যালার্ট (শুধু যদি এটা প্রথম ডিভাইস না হয়)
+  //     if (user.devices.length > 1) {
+  //       await sendSecurityAlertEmail(
+  //         user.email,
+  //         location,
+  //         ipAddress,
+  //         userAgent,
+  //       );
+  //     }
+  //   } else {
+  //     // বিদ্যমান ডিভাইস আপডেট
+  //     existingDevice.ipAddress = ipAddress;
+  //     existingDevice.userAgent = userAgent;
+  //     existingDevice.location = location;
+  //   }
+
+  //   // রোল এবং পারমিশন পপুলেট করুন
+  //   const role = await this.roleModel
+  //     .findById(user.role)
+  //     .populate('permissionIds', 'name') // Permission নাম পপুলেট করুন
+  //     .exec();
+
+  //   if (!role) {
+  //     throw new RpcException({
+  //       code: grpc.status.NOT_FOUND,
+  //       message: 'Role not found for this user.',
+  //     });
+  //   }
+
+  //   console.log(role);
+
+  //   // পারমিশন নামগুলোর তালিকা তৈরি করুন
+  //   const permissions = role.permissionIds.map(
+  //     (permission: any) => permission.name,
+  //   );
+
+  //   console.log(permissions);
+
+  //   // 4. JWT টোকেন জেনারেট
+  //   // const payload = {
+  //   //   sub: user._id.toString(),
+  //   //   email: user.email,
+  //   //   deviceId,
+  //   //   // ipAddress,
+  //   //   roleId: role._id.toString(),
+  //   //   // roleName: role.name, // রোল নাম
+  //   //   schoolId: user.school.toString(),
+  //   //   permissions, // পারমিশন নামের তালিকা
+  //   // };
+  //   const payload = {
+  //     sub: user._id.toString(), // ইউজার ID
+  //     schoolId: user.school.toString(), // স্কুল ID
+  //     roleId: role._id.toString(), // রোল ID
+  //     permissions, // পারমিশন লিস্ট
+  //     deviceId, // ডিভাইস ID
+  //   };
+
+  //   const jwtSecret = process.env.JWT_SECRET;
+  //   if (!jwtSecret) throw new Error('JWT_SECRET not defined');
+
+  //   const accessToken = jwt.sign(payload, jwtSecret, {
+  //     expiresIn: '15m',
+  //   });
+
+  //   const jwtRefreshSecret = process.env.JWT_SECRET;
+  //   if (!jwtRefreshSecret) throw new Error('JWT_SECRET not defined');
+
+  //   const refreshToken = jwt.sign(payload, jwtRefreshSecret, {
+  //     expiresIn: '7d',
+  //   });
+
+  //   user.refreshToken = refreshToken;
+  //   user.lastActive = new Date();
+  //   await user.save();
+
+  //   return {
+  //     accessToken,
+  //     refreshToken,
+  //     user: {
+  //       id: user._id.toString(),
+  //       email: user.email,
+  //       firstName: user.firstName,
+  //       lastName: user.lastName,
+  //       role: user.role,
+  //     },
+  //   };
+  // }
+
+  async login(data: LoginData): Promise<LoginResponse> {
+    const user = await this.authModel.findOne({ email: data.email }).exec();
     if (!user) {
       throw new RpcException({
         code: grpc.status.NOT_FOUND,
@@ -187,60 +330,73 @@ export class AuthService {
     }
 
     const userAgent = data.userAgent;
-    const ipData = await IpAddressGet(); // ধরে নিচ্ছি এটা একটা ফাংশন যা IP ডাটা রিটার্ন করে
-    const ipAddress = ipData.ip;
-    const location = `${ipData.city}, ${ipData.country}`;
-    const deviceId = generateDeviceId(ipAddress, 'userAgent', 'en-US');
+    let ipAddress: string, location: string;
+    try {
+      const ipData = await IpAddressGet();
+      ipAddress = ipData.ip;
+      location = `${ipData.city}, ${ipData.country}`;
+    } catch (error) {
+      throw new RpcException({
+        code: grpc.status.INTERNAL,
+        message: 'IP address not found',
+      });
+    }
 
-    // 3. ডিভাইস ম্যানেজমেন্ট
-    user.devices = user.devices || []; // নিশ্চিত করা যে devices অ্যারে আছে
+    const deviceId = generateDeviceId(ipAddress, userAgent, 'en-US');
+    user.devices = user.devices || [];
     const existingDevice = user.devices.find(
       (d: Device) => d.deviceId === deviceId,
     );
 
     if (!existingDevice) {
-      const newDevice: Device = {
-        deviceId,
-        ipAddress,
-        userAgent,
-        location,
-      };
+      const newDevice: Device = { deviceId, ipAddress, userAgent, location };
+      if (user.devices.length >= 5) user.devices.shift(); // সীমা ৫
       user.devices.push(newDevice);
 
-      // সিকিউরিটি অ্যালার্ট (শুধু যদি এটা প্রথম ডিভাইস না হয়)
       if (user.devices.length > 1) {
-        await sendSecurityAlertEmail(
-          user.email,
-          location,
-          ipAddress,
-          userAgent,
-        );
+        try {
+          await sendSecurityAlertEmail(
+            user.email,
+            location,
+            ipAddress,
+            userAgent,
+          );
+        } catch (error) {
+          console.warn('Email send fail:', error);
+        }
       }
     } else {
-      // বিদ্যমান ডিভাইস আপডেট
       existingDevice.ipAddress = ipAddress;
       existingDevice.userAgent = userAgent;
       existingDevice.location = location;
     }
 
-    // 4. JWT টোকেন জেনারেট
+    const role = await this.roleModel
+      .findById(user.role)
+      .populate('permissionIds', 'name')
+      .exec();
+    if (!role) {
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
+        message: 'Role not found for this user',
+      });
+    }
+
+    // const permissions = role.permissionIds.map((p: any) => p.name);
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) throw new Error('JWT_SECRET not defined');
+
     const payload = {
       sub: user._id.toString(),
-      email: user.email,
+      schoolId: user.school.toString(),
+      roleId: role._id.toString(),
       deviceId,
-      ipAddress,
     };
-    const accessToken = jwt.sign(
-      payload,
-      process.env.JWT_SECRET || 'Q7k9P2mX4vR8tW5wY3nF6jH0eD9cA9bB',
-      {
-        expiresIn: '15m',
-      },
-    );
 
+    const accessToken = jwt.sign(payload, jwtSecret, { expiresIn: '15m' });
     const refreshToken = jwt.sign(
       payload,
-      process.env.JWT_REFRESH_SECRET || 'Q7k9P2mX4vR8tW5wY3nF6jH0eD9cA9bB',
+      process.env.JWT_REFRESH_SECRET || jwtSecret,
       {
         expiresIn: '7d',
       },
@@ -259,6 +415,7 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        school: user.school,
       },
     };
   }

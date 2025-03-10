@@ -45,7 +45,7 @@ export class Teacher {
     default: undefined, // ডিফল্ট undefined
     trim: true,
   })
-  address: string; // শিক্ষক/শিক্ষিকার ঠিকানা
+  address: string | null; // শিক্ষক/শিক্ষিকার ঠিকানা
 
   @Prop({
     required: true,
@@ -75,7 +75,7 @@ export class Teacher {
     default: undefined, // ডিফল্ট undefined
     trim: true,
   })
-  profilePictureUrl: string; // শিক্ষক/শিক্ষিকার প্রোফাইল ছবি (URL)
+  profilePictureUrl: string | null; // শিক্ষক/শিক্ষিকার প্রোফাইল ছবি (URL)
 
   @Prop({
     required: true,
@@ -92,7 +92,7 @@ export class Teacher {
       message: 'Invalid dateOfBirth',
     },
   })
-  dateOfBirth: Date; // শিক্ষক/শিক্ষিকার জন্ম তারিখ
+  dateOfBirth: Date | null; // শিক্ষক/শিক্ষিকার জন্ম তারিখ
 
   @Prop({
     required: true,
@@ -109,10 +109,18 @@ export class Teacher {
   nationality: string; // শিক্ষক/শিক্ষিকার জাতীয়তা
 
   @Prop({
-    type: Object, // Record<string, string> এর জন্য Object ব্যবহার
-    default: undefined, // ডিফল্ট undefined
+    type: Object,
+    validate: {
+      validator: (v: Record<string, string>) => {
+        if (!v) return true;
+        return Object.keys(v).every(
+          (key) => typeof key === 'string' && typeof v[key] === 'string',
+        );
+      },
+      message: 'Invalid socialMediaLinks format',
+    },
   })
-  socialMediaLinks: Record<string, string>; // শিক্ষক/শিক্ষিকার সোশ্যাল মিডিয়া লিঙ্ক
+  socialMediaLinks: Record<string, string> | null; // শিক্ষক/শিক্ষিকার সোশ্যাল মিডিয়া লিঙ্ক
 
   @Prop({
     type: String,
@@ -120,14 +128,14 @@ export class Teacher {
     match: /^\+?[\d\s-]{10,}$/, // ফোন নম্বর ফরম্যাট ভ্যালিডেশন
     trim: true,
   })
-  emergencyContact: string; // শিক্ষক/শিক্ষিকার জরুরি যোগাযোগের নম্বর
+  emergencyContact: string | null; // শিক্ষক/শিক্ষিকার জরুরি যোগাযোগের নম্বর
 
   @Prop({
     type: Number,
     default: null, // ডিফল্ট null
     min: 0, // নেগেটিভ হবে না
   })
-  salary: number; // শিক্ষক/শিক্ষিকার মাসিক বেতন
+  salary: number | null; // শিক্ষক/শিক্ষিকার মাসিক বেতন
 
   @Prop({
     type: Number,

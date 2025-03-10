@@ -13,7 +13,7 @@ import { join } from 'path';
         options: {
           package: 'parent',
           protoPath: join(__dirname, '../../../proto/parent.proto'),
-          url: 'localhost:50057',
+          url: 'localhost:50058',
         },
       },
     ]),
@@ -21,4 +21,4 @@ import { join } from 'path';
   providers: [ParentService, ParentResolver],
   exports: [ParentService],
 })
-export class SchoolModule {}
+export class ParentModule {}

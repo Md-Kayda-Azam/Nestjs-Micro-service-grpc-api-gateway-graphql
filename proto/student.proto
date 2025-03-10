@@ -1,33 +1,59 @@
 syntax = "proto3";
+
 package student;
 
-service StudentService {
-  rpc CreateStudent (CreateStudentRequest) returns (StudentResponse) {}
-  rpc GetAllStudents (GetAllStudentsRequest) returns (GetAllStudentsResponse) {}
-  rpc GetStudent (GetStudentRequest) returns (StudentResponse) {}
-  rpc UpdateStudent (UpdateStudentRequest) returns (StudentResponse) {}
-  rpc DeleteStudent (DeleteStudentRequest) returns (DeleteStudentResponse) {}
-  rpc CreateManyStudents (CreateManyStudentsRequest) returns (CreateManyStudentsResponse) {}
-  rpc DeleteManyStudents (DeleteManyStudentsRequest) returns (DeleteManyStudentsResponse) {}
+// GradeEntry message for grades map
+message GradeEntry {
+  string courseId = 1;
+  int32 grade = 2;
 }
 
+// Student message for student data
+message Student {
+  string id = 1;
+  string schoolId = 2;
+  string dateOfBirth = 3; // ISO string
+  string gender = 4;
+  string studentID = 5;
+  string email = 6;
+  string phoneNumber = 7;
+  string address = 8;
+  string admissionDate = 9; // ISO string
+  string enrollmentDate = 10; // ISO string
+  string classId = 11;
+  repeated string enrolledCourses = 12;
+  repeated GradeEntry grades = 13; // Map is represented as repeated GradeEntry
+  repeated string extracurricularActivities = 14;
+  string parentId = 15;
+  string nationality = 16;
+  string graduationDate = 17; // ISO string
+  string profilePictureUrl = 18;
+  repeated string awards = 19;
+  string healthDetails = 20;
+  bool isSpecialNeeds = 21;
+  string remarks = 22;
+  string createdAt = 23; // ISO string
+  string updatedAt = 24; // ISO string
+}
+
+// CreateStudentRequest message
 message CreateStudentRequest {
   string schoolId = 1;
-  string dateOfBirth = 2; // Date as string (ISO format)
+  string dateOfBirth = 2; // ISO string
   string gender = 3;
   string studentID = 4;
   string email = 5;
   string phoneNumber = 6;
   string address = 7;
-  string admissionDate = 8; // Date as string (ISO format)
-  string enrollmentDate = 9; // Date as string (ISO format)
-  string classID = 10;
+  string admissionDate = 8; // ISO string
+  string enrollmentDate = 9; // ISO string
+  string classId = 10;
   repeated string enrolledCourses = 11;
-  map<string, int32> grades = 12;
+  repeated GradeEntry grades = 12; // Map is represented as repeated GradeEntry
   repeated string extracurricularActivities = 13;
-  string parentID = 14;
+  string parentId = 14;
   string nationality = 15;
-  string graduationDate = 16; // Date as string (ISO format)
+  string graduationDate = 16; // ISO string
   string profilePictureUrl = 17;
   repeated string awards = 18;
   string healthDetails = 19;
@@ -35,66 +61,43 @@ message CreateStudentRequest {
   string remarks = 21;
 }
 
-message StudentResponse {
-  string id = 1;
-  string schoolId = 2;
-  string dateOfBirth = 3; // Date as string (ISO format)
-  string gender = 4;
-  string studentID = 5;
-  string email = 6;
-  string phoneNumber = 7;
-  string address = 8;
-  string admissionDate = 9; // Date as string (ISO format)
-  string enrollmentDate = 10; // Date as string (ISO format)
-  string classID = 11;
-  repeated string enrolledCourses = 12;
-  map<string, int32> grades = 13;
-  repeated string extracurricularActivities = 14;
-  string parentID = 15;
-  string nationality = 16;
-  string graduationDate = 17; // Date as string (ISO format)
-  string profilePictureUrl = 18;
-  repeated string awards = 19;
-  string healthDetails = 20;
-  bool isSpecialNeeds = 21;
-  string remarks = 22;
-  string createdAt = 23;
-  string updatedAt = 24;
-}
-
+// GetAllStudentsRequest message
 message GetAllStudentsRequest {
-  bool isActive = 1; // ফিল্টারের জন্য (যদিও স্কিমায় নেই, জেনেরিক ফিল্টার হিসেবে)
-  int32 limit = 2; // পেজিনেশনের জন্য
-  int32 offset = 3; // পেজিনেশনের জন্য
+  bool isActive = 1;
+  int32 limit = 2;
+  int32 offset = 3;
 }
 
+// GetAllStudentsResponse message
 message GetAllStudentsResponse {
-  repeated StudentResponse students = 1;
-  int32 total = 2; // মোট রেকর্ড সংখ্যা
+  repeated Student students = 1;
+  int32 total = 2;
 }
 
+// GetStudentRequest message
 message GetStudentRequest {
   string id = 1;
 }
 
+// UpdateStudentRequest message
 message UpdateStudentRequest {
   string id = 1;
   string schoolId = 2;
-  string dateOfBirth = 3; // Date as string (ISO format)
+  string dateOfBirth = 3; // ISO string
   string gender = 4;
   string studentID = 5;
   string email = 6;
   string phoneNumber = 7;
   string address = 8;
-  string admissionDate = 9; // Date as string (ISO format)
-  string enrollmentDate = 10; // Date as string (ISO format)
-  string classID = 11;
+  string admissionDate = 9; // ISO string
+  string enrollmentDate = 10; // ISO string
+  string classId = 11;
   repeated string enrolledCourses = 12;
-  map<string, int32> grades = 13;
+  repeated GradeEntry grades = 13; // Map is represented as repeated GradeEntry
   repeated string extracurricularActivities = 14;
-  string parentID = 15;
+  string parentId = 15;
   string nationality = 16;
-  string graduationDate = 17; // Date as string (ISO format)
+  string graduationDate = 17; // ISO string
   string profilePictureUrl = 18;
   repeated string awards = 19;
   string healthDetails = 20;
@@ -102,28 +105,45 @@ message UpdateStudentRequest {
   string remarks = 22;
 }
 
+// DeleteStudentRequest message
 message DeleteStudentRequest {
   string id = 1;
 }
 
+// DeleteStudentResponse message
 message DeleteStudentResponse {
   bool success = 1;
   string message = 2;
 }
 
+// CreateManyStudentsRequest message
 message CreateManyStudentsRequest {
   repeated CreateStudentRequest students = 1;
 }
 
+// CreateManyStudentsResponse message
 message CreateManyStudentsResponse {
-  repeated StudentResponse students = 1;
+  repeated Student students = 1;
 }
 
+// DeleteManyStudentsRequest message
 message DeleteManyStudentsRequest {
   repeated string ids = 1;
 }
 
+// DeleteManyStudentsResponse message
 message DeleteManyStudentsResponse {
   bool success = 1;
   string message = 2;
+}
+
+// StudentService service definition
+service StudentService {
+  rpc CreateStudent(CreateStudentRequest) returns (Student) {}
+  rpc GetAllStudents(GetAllStudentsRequest) returns (GetAllStudentsResponse) {}
+  rpc GetStudent(GetStudentRequest) returns (Student) {}
+  rpc UpdateStudent(UpdateStudentRequest) returns (Student) {}
+  rpc DeleteStudent(DeleteStudentRequest) returns (DeleteStudentResponse) {}
+  rpc CreateManyStudents(CreateManyStudentsRequest) returns (CreateManyStudentsResponse) {}
+  rpc DeleteManyStudents(DeleteManyStudentsRequest) returns (DeleteManyStudentsResponse) {}
 }

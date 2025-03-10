@@ -15,7 +15,13 @@ export interface GrpcTeacherResponse {
   dateOfBirth: string;
   gender: string;
   nationality: string;
-  socialMediaLinks: { [key: string]: string };
+  socialMediaLinks: {
+    // Update this
+    facebook?: string;
+    twitter?: string;
+    linkedin?: string;
+    instagram?: string;
+  };
   emergencyContact: string;
   salary: number;
   teachingExperienceYears: number;
@@ -40,31 +46,19 @@ export interface CreateTeacherRequest {
   dateOfBirth: string;
   gender: string;
   nationality: string;
-  socialMediaLinks: { [key: string]: string };
+  socialMediaLinks: {
+    // Update this
+    facebook?: string;
+    twitter?: string;
+    linkedin?: string;
+    instagram?: string;
+  };
   emergencyContact: string;
   salary: number;
   teachingExperienceYears: number;
   assignedClasses: string[];
   assignedSubjects: string[];
   studentCount: number;
-}
-
-// Get all teachers request
-export interface GetAllTeachersRequest {
-  status: string;
-  limit: number;
-  offset: number;
-}
-
-// Get all teachers response
-export interface GetAllTeachersResponse {
-  teachers: GrpcTeacherResponse[];
-  total: number;
-}
-
-// Get teacher request
-export interface GetTeacherRequest {
-  id: string;
 }
 
 // Update teacher request
@@ -82,7 +76,13 @@ export interface UpdateTeacherRequest {
   dateOfBirth: string;
   gender: string;
   nationality: string;
-  socialMediaLinks: { [key: string]: string };
+  socialMediaLinks: {
+    // Update this
+    facebook?: string;
+    twitter?: string;
+    linkedin?: string;
+    instagram?: string;
+  };
   emergencyContact: string;
   salary: number;
   teachingExperienceYears: number;
@@ -91,39 +91,48 @@ export interface UpdateTeacherRequest {
   studentCount: number;
 }
 
-// Delete teacher request
+// Rest of the interfaces remain the same
+export interface GetAllTeachersRequest {
+  status: string;
+  limit: number;
+  offset: number;
+}
+
+export interface GetAllTeachersResponse {
+  teachers: GrpcTeacherResponse[];
+  total: number;
+}
+
+export interface GetTeacherRequest {
+  id: string;
+}
+
 export interface DeleteTeacherRequest {
   id: string;
 }
 
-// Delete teacher response
 export interface DeleteTeacherResponse {
   success: boolean;
   message: string;
 }
 
-// Create many teachers request
 export interface CreateManyTeachersRequest {
   teachers: CreateTeacherRequest[];
 }
 
-// Create many teachers response
 export interface CreateManyTeachersResponse {
   teachers: GrpcTeacherResponse[];
 }
 
-// Delete many teachers request
 export interface DeleteManyTeachersRequest {
   ids: string[];
 }
 
-// Delete many teachers response
 export interface DeleteManyTeachersResponse {
   success: boolean;
   message: string;
 }
 
-// gRPC service interface
 export interface TeacherGrpcService {
   CreateTeacher(data: CreateTeacherRequest): Observable<GrpcTeacherResponse>;
   GetAllTeachers(

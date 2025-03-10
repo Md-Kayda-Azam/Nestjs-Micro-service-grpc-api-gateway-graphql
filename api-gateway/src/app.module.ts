@@ -1,20 +1,23 @@
 import { Module, ValidationPipe } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_PIPE, APP_GUARD, APP_FILTER } from '@nestjs/core';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLError } from 'graphql';
 import { ValidationError } from 'class-validator';
 import { UserModule } from './user/user.module';
-import { GraphQLExceptionFilter } from './graphql-exception.filter';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AuthModule } from './auth/auth.module';
-import { AuthGuard } from './shared/guards/auth.guard';
 import { RoleModule } from './role/role.module';
 import { SchoolModule } from './school/school.module';
-// import { StudentModule } from './student/student.module';
-// import { TeacherModule } from './teacher/teacher.module';
-// import { ParentModule } from './parent/parent.module';
+import { StudentModule } from './student/student.module';
+import { TeacherModule } from './teacher/teacher.module';
+import { ParentModule } from './parent/parent.module';
+import { GraphQLExceptionFilter } from './graphql-exception.filter';
+import { AuthGuard } from './shared/guards/auth.guard';
+import { RedisService } from './shared/guards/redis.service';
+import { PermissionService } from './permission/permission.service';
+import { PermissionGuard } from './shared/guards/permission.guard';
 import { PermissionModule } from './permission/permission.module';
 
 @Module({
@@ -22,6 +25,8 @@ import { PermissionModule } from './permission/permission.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      playground: true, // GraphQL Playground সক্রিয় করা (ডেভেলপমেন্টের জন্য)
+      context: ({ req }) => ({ req }), // রিকোয়েস্ট কনটেক্সটে পাঠানো
     }),
     ClientsModule.register([
       {
@@ -48,7 +53,7 @@ import { PermissionModule } from './permission/permission.module';
         options: {
           package: 'permission',
           protoPath: join(__dirname, '../../proto/permission.proto'),
-          url: 'localhost:50053',
+          url: 'localhost:50052',
         },
       },
       {
@@ -57,7 +62,7 @@ import { PermissionModule } from './permission/permission.module';
         options: {
           package: 'role',
           protoPath: join(__dirname, '../../proto/role.proto'),
-          url: 'localhost:50054',
+          url: 'localhost:50052',
         },
       },
       {
@@ -99,16 +104,16 @@ import { PermissionModule } from './permission/permission.module';
     ]),
     UserModule,
     AuthModule,
-    // PermissionModule,
-    // RoleModule,
-    SchoolModule,
-    // StudentModule,
-    // TeacherModule,
-    // ParentModule,
+    PermissionModule,
+    RoleModule,
+    SchoolModule, // কমেন্ট সরিয়ে সক্রিয় করা
+    StudentModule, // কমেন্ট সরিয়ে সক্রিয় করা
+    TeacherModule, // কমেন্ট সরিয়ে সক্রিয় করা
+    ParentModule, // কমেন্ট সরিয়ে সক্রিয় করা
   ],
   providers: [
     {
-      provide: 'APP_FILTER',
+      provide: APP_FILTER,
       useClass: GraphQLExceptionFilter,
     },
     {
@@ -128,11 +133,17 @@ import { PermissionModule } from './permission/permission.module';
         },
       }),
     },
-    // {
-    //   provide: 'APP_GUARD', // গ্লোবাল গার্ড
-    //   useClass: AuthGuard,
-    // },
+    {
+      provide: APP_GUARD, // গ্লোবাল AuthGuard সক্রিয় করা
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD, // গ্লোবাল PermissionGuard যুক্ত করা
+      useClass: PermissionGuard,
+    },
+    RedisService, // RedisService যুক্ত করা
+    PermissionService,
   ],
-  exports: [ClientsModule], // Export ClientsModule to make USER_PACKAGE available
+  exports: [ClientsModule], // ClientsModule এক্সপোর্ট করা
 })
 export class AppModule {}

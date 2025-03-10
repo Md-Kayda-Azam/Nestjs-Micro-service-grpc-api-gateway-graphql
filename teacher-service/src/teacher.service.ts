@@ -320,7 +320,7 @@ export class TeacherService {
           dateOfBirth: t.dateOfBirth ? t.dateOfBirth.toISOString() : null,
           gender: t.gender,
           nationality: t.nationality,
-          socialMediaLinks: t.socialMediaLinks,
+          socialMediaLinks: t.socialMediaLinks ? t.socialMediaLinks : null,
           emergencyContact: t.emergencyContact,
           salary: t.salary,
           teachingExperienceYears: t.teachingExperienceYears,

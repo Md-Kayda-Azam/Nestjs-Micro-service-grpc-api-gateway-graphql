@@ -13,6 +13,10 @@ import {
   DeleteManyStudentsOutput,
 } from './entities/student.entity';
 import { GraphQLError } from 'graphql';
+import { UseGuards } from '@nestjs/common';
+import { Permissions } from 'src/shared/guards/decorator/permissions.decorator';
+import { AuthGuard } from 'src/shared/guards/auth.guard';
+import { PermissionGuard } from 'src/shared/guards/permission.guard';
 
 @Resolver(() => Student)
 export class StudentResolver {
@@ -36,6 +40,8 @@ export class StudentResolver {
   }
 
   @Query(() => GetAllStudentsOutput)
+  @UseGuards(AuthGuard, PermissionGuard)
+  @Permissions('user:create')
   async getAllStudents(
     @Args('getAllStudentsInput') getAllStudentsInput: GetAllStudentsInput,
   ): Promise<GetAllStudentsOutput> {

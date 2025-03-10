@@ -16,7 +16,6 @@ import {
   DeleteManyRolesOutput,
 } from './entities/role.entity';
 import { PermissionService } from 'src/permission/permission.service';
-import { Permission } from 'src/permission/entities/permission.entity';
 
 @Injectable()
 export class RoleService {
@@ -120,8 +119,6 @@ export class RoleService {
         }),
       );
 
-      console.log(roles, 'Processed roles with permissions');
-
       return { roles, total };
     } catch (error) {
       const errorMessage =
@@ -136,10 +133,15 @@ export class RoleService {
       const response = await lastValueFrom(
         this.roleGrpcService.GetRole({ id }),
       );
-      console.log(response.permissionIds);
+      // console.log(response.permissionIds);
       const permissions = await this.populatePermissions(
         response.permissionIds,
       );
+      // console.log(
+      //   permissions.map((p) => p.name),
+      //   'getPermission',
+      // );
+
       return {
         _id: response.id,
         name: response.name,

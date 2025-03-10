@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { StudentService } from './student.service';
-import { StudentResolver } from './student.resolver';
+
 import { join } from 'path';
+import { StudentResolver } from './student.resolver';
+import { StudentService } from './student.service';
 
 @Module({
   imports: [
@@ -12,13 +13,13 @@ import { join } from 'path';
         transport: Transport.GRPC,
         options: {
           package: 'student',
-          protoPath: join(__dirname, '../../../proto/school.proto'),
+          protoPath: join(__dirname, '../../../proto/student.proto'),
           url: 'localhost:50056',
         },
       },
     ]),
   ],
-  providers: [StudentService, StudentResolver],
+  providers: [StudentResolver, StudentService],
   exports: [StudentService],
 })
-export class SchoolModule {}
+export class StudentModule {}

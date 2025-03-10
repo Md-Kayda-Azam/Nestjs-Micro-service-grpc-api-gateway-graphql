@@ -14,7 +14,7 @@ import { PermissionModule } from 'src/permission/permission.module';
         options: {
           package: 'role',
           protoPath: join(__dirname, '../../../proto/role.proto'),
-          url: 'localhost:50054',
+          url: 'localhost:50052',
         },
       },
     ]),

@@ -1,5 +1,10 @@
 import { Observable } from 'rxjs';
 
+export interface GradeEntry {
+  courseId: string;
+  grade: number;
+}
+
 // Student response type
 export interface GrpcStudentResponse {
   id: string;
@@ -12,11 +17,11 @@ export interface GrpcStudentResponse {
   address: string;
   admissionDate: string;
   enrollmentDate: string;
-  classID: string;
+  classId: string;
   enrolledCourses: string[];
-  grades: { [key: string]: number };
+  grades: GradeEntry[];
   extracurricularActivities: string[];
-  parentID: string;
+  parentId: string;
   nationality: string;
   graduationDate: string;
   profilePictureUrl: string;
@@ -39,11 +44,11 @@ export interface CreateStudentRequest {
   address: string;
   admissionDate: string;
   enrollmentDate: string;
-  classID: string;
+  classId: string;
   enrolledCourses: string[];
-  grades: { [key: string]: number };
+  grades: GradeEntry[];
   extracurricularActivities: string[];
-  parentID: string;
+  parentId: string;
   nationality: string;
   graduationDate: string;
   profilePictureUrl: string;
@@ -83,11 +88,11 @@ export interface UpdateStudentRequest {
   address: string;
   admissionDate: string;
   enrollmentDate: string;
-  classID: string;
+  classId: string;
   enrolledCourses: string[];
-  grades: { [key: string]: number };
+  grades: GradeEntry[];
   extracurricularActivities: string[];
-  parentID: string;
+  parentId: string;
   nationality: string;
   graduationDate: string;
   profilePictureUrl: string;

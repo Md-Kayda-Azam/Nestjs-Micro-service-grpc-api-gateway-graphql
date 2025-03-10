@@ -79,7 +79,7 @@ export class Student {
     default: undefined, // ডিফল্ট মান null
     trim: true, // অতিরিক্ত স্পেস রিমুভ
   })
-  address: string; // ছাত্রের ঠিকানা (ঐচ্ছিক)
+  address: string | null; // ছাত্রের ঠিকানা (ঐচ্ছিক)
 
   @Prop({
     required: true,
@@ -149,7 +149,7 @@ export class Student {
     default: undefined, // ডিফল্ট মান null
     trim: true,
   })
-  profilePictureUrl: string; // ছাত্রের প্রোফাইল ছবি
+  profilePictureUrl: string | null; // ছাত্রের প্রোফাইল ছবি
 
   @Prop({
     type: [String],
@@ -162,7 +162,7 @@ export class Student {
     default: undefined, // ডিফল্ট মান null
     trim: true,
   })
-  healthDetails: string; // ছাত্রের স্বাস্থ্য সম্পর্কিত বিবরণ
+  healthDetails: string | null; // ছাত্রের স্বাস্থ্য সম্পর্কিত বিবরণ
 
   @Prop({
     type: Boolean,
@@ -175,7 +175,7 @@ export class Student {
     default: undefined, // ডিফল্ট মান null
     trim: true,
   })
-  remarks: string; // ছাত্রের বিষয়ে যে কোনো মন্তব্য
+  remarks: string | null; // ছাত্রের বিষয়ে যে কোনো মন্তব্য
 }
 
 export const StudentSchema = SchemaFactory.createForClass(Student);

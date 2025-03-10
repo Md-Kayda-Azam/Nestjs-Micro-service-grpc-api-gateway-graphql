@@ -10,7 +10,12 @@ import * as jwt from 'jsonwebtoken';
 interface JwtPayload {
   sub: string;
   email: string;
-  role: string;
+  deviceId: string;
+  ipAddress: string;
+  roleId: string;
+  roleName: string;
+  schoolId: string;
+  permissions: string[];
 }
 
 @Injectable()
@@ -39,7 +44,19 @@ export class AuthGuard implements CanActivate {
       const decoded = jwt.verify(token, secret, {
         algorithms: ['HS256'],
       }) as JwtPayload;
-      request.user = decoded;
+
+      // ইউজারের রোল এবং পারমিশন সংরক্ষণ করুন
+      request.user = {
+        userId: decoded.sub,
+        email: decoded.email,
+        deviceId: decoded.deviceId,
+        ipAddress: decoded.ipAddress,
+        roleId: decoded.roleId,
+        roleName: decoded.roleName,
+        schoolId: decoded.schoolId,
+        permissions: decoded.permissions,
+      };
+
       return true;
     } catch {
       throw new UnauthorizedException('Invalid or expired token');

@@ -28,3 +28,16 @@ export interface ResetPasswordData {
 export interface LogoutData {
   refreshToken: string;
 }
+
+export type LoginResponse = {
+  accessToken: string;
+  refreshToken?: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: string;
+    school: string;
+  };
+};

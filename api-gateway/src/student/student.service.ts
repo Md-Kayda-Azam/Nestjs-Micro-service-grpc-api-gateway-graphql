@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
+import { RpcException } from '@nestjs/microservices';
+import * as grpc from '@grpc/grpc-js';
 import { StudentGrpcService } from './types/studentTypes';
 import {
   Student,
@@ -24,39 +26,47 @@ export class StudentService {
       this.client.getService<StudentGrpcService>('StudentService');
   }
 
+  // Helper method to map gRPC response to Student entity
+  private mapGrpcStudentToEntity(response: any): Student {
+    return {
+      _id: response.id,
+      schoolId: response.schoolId,
+      dateOfBirth: response.dateOfBirth,
+      gender: response.gender,
+      studentID: response.studentID,
+      email: response.email,
+      phoneNumber: response.phoneNumber,
+      address: response.address,
+      admissionDate: response.admissionDate,
+      enrollmentDate: response.enrollmentDate,
+      classId: response.classId,
+      enrolledCourses: response.enrolledCourses || [],
+      grades: response.grades || [],
+      extracurricularActivities: response.extracurricularActivities || [],
+      parentId: response.parentId,
+      nationality: response.nationality,
+      graduationDate: response.graduationDate,
+      profilePictureUrl: response.profilePictureUrl,
+      awards: response.awards || [],
+      healthDetails: response.healthDetails,
+      isSpecialNeeds: response.isSpecialNeeds || false,
+      remarks: response.remarks,
+      createdAt: response.createdAt,
+      updatedAt: response.updatedAt,
+    };
+  }
+
   async createStudent(data: CreateStudentInput): Promise<Student> {
     try {
       const response = await lastValueFrom(
         this.studentGrpcService.CreateStudent(data),
       );
-      return {
-        _id: response.id,
-        schoolId: response.schoolId,
-        dateOfBirth: response.dateOfBirth,
-        gender: response.gender,
-        studentID: response.studentID,
-        email: response.email,
-        phoneNumber: response.phoneNumber,
-        address: response.address,
-        admissionDate: response.admissionDate,
-        enrollmentDate: response.enrollmentDate,
-        classID: response.classID,
-        enrolledCourses: response.enrolledCourses,
-        grades: response.grades,
-        extracurricularActivities: response.extracurricularActivities,
-        parentID: response.parentID,
-        nationality: response.nationality,
-        graduationDate: response.graduationDate,
-        profilePictureUrl: response.profilePictureUrl,
-        awards: response.awards,
-        healthDetails: response.healthDetails,
-        isSpecialNeeds: response.isSpecialNeeds,
-        remarks: response.remarks,
-        createdAt: response.createdAt,
-        updatedAt: response.updatedAt,
-      };
+      return this.mapGrpcStudentToEntity(response);
     } catch (error) {
-      throw new Error(error.details || 'Failed to create student');
+      throw new RpcException({
+        code: error.code || grpc.status.INTERNAL,
+        message: error.details || 'Failed to create student',
+      });
     }
   }
 
@@ -68,36 +78,16 @@ export class StudentService {
         this.studentGrpcService.GetAllStudents(data),
       );
       return {
-        students: response.students.map((student) => ({
-          _id: student.id,
-          schoolId: student.schoolId,
-          dateOfBirth: student.dateOfBirth,
-          gender: student.gender,
-          studentID: student.studentID,
-          email: student.email,
-          phoneNumber: student.phoneNumber,
-          address: student.address,
-          admissionDate: student.admissionDate,
-          enrollmentDate: student.enrollmentDate,
-          classID: student.classID,
-          enrolledCourses: student.enrolledCourses,
-          grades: student.grades,
-          extracurricularActivities: student.extracurricularActivities,
-          parentID: student.parentID,
-          nationality: student.nationality,
-          graduationDate: student.graduationDate,
-          profilePictureUrl: student.profilePictureUrl,
-          awards: student.awards,
-          healthDetails: student.healthDetails,
-          isSpecialNeeds: student.isSpecialNeeds,
-          remarks: student.remarks,
-          createdAt: student.createdAt,
-          updatedAt: student.updatedAt,
-        })),
+        students: response.students.map((student) =>
+          this.mapGrpcStudentToEntity(student),
+        ),
         total: response.total,
       };
     } catch (error) {
-      throw new Error(error.details || 'Failed to fetch students');
+      throw new RpcException({
+        code: error.code || grpc.status.INTERNAL,
+        message: error.details || 'Failed to fetch students',
+      });
     }
   }
 
@@ -106,34 +96,12 @@ export class StudentService {
       const response = await lastValueFrom(
         this.studentGrpcService.GetStudent({ id }),
       );
-      return {
-        _id: response.id,
-        schoolId: response.schoolId,
-        dateOfBirth: response.dateOfBirth,
-        gender: response.gender,
-        studentID: response.studentID,
-        email: response.email,
-        phoneNumber: response.phoneNumber,
-        address: response.address,
-        admissionDate: response.admissionDate,
-        enrollmentDate: response.enrollmentDate,
-        classID: response.classID,
-        enrolledCourses: response.enrolledCourses,
-        grades: response.grades,
-        extracurricularActivities: response.extracurricularActivities,
-        parentID: response.parentID,
-        nationality: response.nationality,
-        graduationDate: response.graduationDate,
-        profilePictureUrl: response.profilePictureUrl,
-        awards: response.awards,
-        healthDetails: response.healthDetails,
-        isSpecialNeeds: response.isSpecialNeeds,
-        remarks: response.remarks,
-        createdAt: response.createdAt,
-        updatedAt: response.updatedAt,
-      };
+      return this.mapGrpcStudentToEntity(response);
     } catch (error) {
-      throw new Error(error.details || 'Failed to fetch student');
+      throw new RpcException({
+        code: error.code || grpc.status.INTERNAL,
+        message: error.details || 'Failed to fetch student',
+      });
     }
   }
 
@@ -142,34 +110,12 @@ export class StudentService {
       const response = await lastValueFrom(
         this.studentGrpcService.UpdateStudent(data),
       );
-      return {
-        _id: response.id,
-        schoolId: response.schoolId,
-        dateOfBirth: response.dateOfBirth,
-        gender: response.gender,
-        studentID: response.studentID,
-        email: response.email,
-        phoneNumber: response.phoneNumber,
-        address: response.address,
-        admissionDate: response.admissionDate,
-        enrollmentDate: response.enrollmentDate,
-        classID: response.classID,
-        enrolledCourses: response.enrolledCourses,
-        grades: response.grades,
-        extracurricularActivities: response.extracurricularActivities,
-        parentID: response.parentID,
-        nationality: response.nationality,
-        graduationDate: response.graduationDate,
-        profilePictureUrl: response.profilePictureUrl,
-        awards: response.awards,
-        healthDetails: response.healthDetails,
-        isSpecialNeeds: response.isSpecialNeeds,
-        remarks: response.remarks,
-        createdAt: response.createdAt,
-        updatedAt: response.updatedAt,
-      };
+      return this.mapGrpcStudentToEntity(response);
     } catch (error) {
-      throw new Error(error.details || 'Failed to update student');
+      throw new RpcException({
+        code: error.code || grpc.status.INTERNAL,
+        message: error.details || 'Failed to update student',
+      });
     }
   }
 
@@ -183,7 +129,10 @@ export class StudentService {
         message: response.message,
       };
     } catch (error) {
-      throw new Error(error.details || 'Failed to delete student');
+      throw new RpcException({
+        code: error.code || grpc.status.INTERNAL,
+        message: error.details || 'Failed to delete student',
+      });
     }
   }
 
@@ -195,35 +144,15 @@ export class StudentService {
         this.studentGrpcService.CreateManyStudents(data),
       );
       return {
-        students: response.students.map((student) => ({
-          _id: student.id,
-          schoolId: student.schoolId,
-          dateOfBirth: student.dateOfBirth,
-          gender: student.gender,
-          studentID: student.studentID,
-          email: student.email,
-          phoneNumber: student.phoneNumber,
-          address: student.address,
-          admissionDate: student.admissionDate,
-          enrollmentDate: student.enrollmentDate,
-          classID: student.classID,
-          enrolledCourses: student.enrolledCourses,
-          grades: student.grades,
-          extracurricularActivities: student.extracurricularActivities,
-          parentID: student.parentID,
-          nationality: student.nationality,
-          graduationDate: student.graduationDate,
-          profilePictureUrl: student.profilePictureUrl,
-          awards: student.awards,
-          healthDetails: student.healthDetails,
-          isSpecialNeeds: student.isSpecialNeeds,
-          remarks: student.remarks,
-          createdAt: student.createdAt,
-          updatedAt: student.updatedAt,
-        })),
+        students: response.students.map((student) =>
+          this.mapGrpcStudentToEntity(student),
+        ),
       };
     } catch (error) {
-      throw new Error(error.details || 'Failed to create multiple students');
+      throw new RpcException({
+        code: error.code || grpc.status.INTERNAL,
+        message: error.details || 'Failed to create multiple students',
+      });
     }
   }
 
@@ -239,7 +168,10 @@ export class StudentService {
         message: response.message,
       };
     } catch (error) {
-      throw new Error(error.details || 'Failed to delete multiple students');
+      throw new RpcException({
+        code: error.code || grpc.status.INTERNAL,
+        message: error.details || 'Failed to delete multiple students',
+      });
     }
   }
 }

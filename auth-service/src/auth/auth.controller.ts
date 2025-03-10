@@ -10,7 +10,7 @@ import {
   ResendVerificationData,
   ResetPasswordData,
   VerifyAccountData,
-} from './types/authTypes';
+} from '../types/authTypes';
 
 @Controller()
 export class AuthController {
