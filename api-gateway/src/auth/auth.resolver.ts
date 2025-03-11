@@ -101,18 +101,3 @@ export class AuthResolver {
     return this.authService.logout(token);
   }
 }
-
-// @Query(() => Auth, { name: 'auth' })
-// findOne(@Args('id', { type: () => Int }) id: number) {
-//   return this.authService.findOne(id);
-// }
-
-// @Mutation(() => Auth)
-// updateAuth(@Args('updateAuthInput') updateAuthInput: UpdateAuthInput) {
-//   return this.authService.update(updateAuthInput.id, updateAuthInput);
-// }
-
-// @Mutation(() => Auth)
-// removeAuth(@Args('id', { type: () => Int }) id: number) {
-//   return this.authService.remove(id);
-// }

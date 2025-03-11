@@ -13,16 +13,14 @@ import {
   DeleteManyStudentsOutput,
 } from './entities/student.entity';
 import { GraphQLError } from 'graphql';
-import { UseGuards } from '@nestjs/common';
 import { Permissions } from 'src/shared/guards/decorator/permissions.decorator';
-import { AuthGuard } from 'src/shared/guards/auth.guard';
-import { PermissionGuard } from 'src/shared/guards/permission.guard';
 
 @Resolver(() => Student)
 export class StudentResolver {
   constructor(private readonly studentService: StudentService) {}
 
   @Mutation(() => Student)
+  @Permissions('student:create')
   async createStudent(
     @Args('createStudentInput') createStudentInput: CreateStudentInput,
   ): Promise<Student> {
@@ -40,8 +38,7 @@ export class StudentResolver {
   }
 
   @Query(() => GetAllStudentsOutput)
-  @UseGuards(AuthGuard, PermissionGuard)
-  @Permissions('user:create')
+  @Permissions('student:view')
   async getAllStudents(
     @Args('getAllStudentsInput') getAllStudentsInput: GetAllStudentsInput,
   ): Promise<GetAllStudentsOutput> {
@@ -57,6 +54,7 @@ export class StudentResolver {
   }
 
   @Query(() => Student)
+  @Permissions('student:view')
   async getStudent(
     @Args('id', { type: () => String }) id: string,
   ): Promise<Student> {
@@ -74,6 +72,7 @@ export class StudentResolver {
   }
 
   @Mutation(() => Student)
+  @Permissions('student:update')
   async updateStudent(
     @Args('updateStudentInput') updateStudentInput: UpdateStudentInput,
   ): Promise<Student> {
@@ -91,6 +90,7 @@ export class StudentResolver {
   }
 
   @Mutation(() => DeleteStudentOutput)
+  @Permissions('student:delete')
   async deleteStudent(
     @Args('id', { type: () => String }) id: string,
   ): Promise<DeleteStudentOutput> {
@@ -108,6 +108,7 @@ export class StudentResolver {
   }
 
   @Mutation(() => CreateManyStudentsOutput)
+  @Permissions('student:create')
   async createManyStudents(
     @Args('createManyStudentsInput')
     createManyStudentsInput: CreateManyStudentsInput,
@@ -128,6 +129,7 @@ export class StudentResolver {
   }
 
   @Mutation(() => DeleteManyStudentsOutput)
+  @Permissions('student:delete')
   async deleteManyStudents(
     @Args('deleteManyStudentsInput')
     deleteManyStudentsInput: DeleteManyStudentsInput,

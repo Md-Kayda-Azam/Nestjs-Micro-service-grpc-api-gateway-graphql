@@ -13,12 +13,14 @@ import {
   DeleteManyRolesOutput,
 } from './entities/role.entity';
 import { GraphQLError } from 'graphql';
+import { Permissions } from 'src/shared/guards/decorator/permissions.decorator';
 
 @Resolver(() => Role)
 export class RoleResolver {
   constructor(private readonly roleService: RoleService) {}
 
   @Mutation(() => Role)
+  @Permissions('user:manage-roles')
   async createRole(
     @Args('createRoleInput') createRoleInput: CreateRoleInput,
   ): Promise<Role> {
@@ -36,6 +38,7 @@ export class RoleResolver {
   }
 
   @Query(() => GetAllRolesOutput)
+  @Permissions('user:manage-roles')
   async getAllRoles(
     @Args('getAllRolesInput') getAllRolesInput: GetAllRolesInput,
   ): Promise<GetAllRolesOutput> {
@@ -51,6 +54,7 @@ export class RoleResolver {
   }
 
   @Query(() => Role)
+  @Permissions('user:manage-roles')
   async getRole(@Args('id', { type: () => String }) id: string): Promise<Role> {
     try {
       return await this.roleService.getRole(id);
@@ -66,6 +70,7 @@ export class RoleResolver {
   }
 
   @Mutation(() => Role)
+  @Permissions('user:manage-roles')
   async updateRole(
     @Args('updateRoleInput') updateRoleInput: UpdateRoleInput,
   ): Promise<Role> {
@@ -83,6 +88,7 @@ export class RoleResolver {
   }
 
   @Mutation(() => DeleteRoleOutput)
+  @Permissions('user:manage-roles')
   async deleteRole(
     @Args('id', { type: () => String }) id: string,
   ): Promise<DeleteRoleOutput> {
@@ -100,6 +106,7 @@ export class RoleResolver {
   }
 
   @Mutation(() => CreateManyRolesOutput)
+  @Permissions('user:manage-roles')
   async createManyRoles(
     @Args('createManyRolesInput') createManyRolesInput: CreateManyRolesInput,
   ): Promise<CreateManyRolesOutput> {
@@ -117,6 +124,7 @@ export class RoleResolver {
   }
 
   @Mutation(() => DeleteManyRolesOutput)
+  @Permissions('user:manage-roles')
   async deleteManyRoles(
     @Args('deleteManyRolesInput') deleteManyRolesInput: DeleteManyRolesInput,
   ): Promise<DeleteManyRolesOutput> {

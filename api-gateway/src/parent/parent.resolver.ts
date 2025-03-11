@@ -13,18 +13,14 @@ import {
   DeleteManyParentsOutput,
 } from './entities/parent.entity';
 import { GraphQLError } from 'graphql';
-import { UseGuards } from '@nestjs/common';
 import { Permissions } from 'src/shared/guards/decorator/permissions.decorator';
-import { AuthGuard } from 'src/shared/guards/auth.guard';
-import { PermissionGuard } from 'src/shared/guards/permission.guard';
 
 @Resolver(() => Parent)
 export class ParentResolver {
   constructor(private readonly parentService: ParentService) {}
 
   @Mutation(() => Parent)
-  // @UseGuards(AuthGuard, PermissionGuard)
-  // @Permissions('user:create')
+  @Permissions('user:create')
   async createParent(
     @Args('createParentInput') createParentInput: CreateParentInput,
   ): Promise<Parent> {

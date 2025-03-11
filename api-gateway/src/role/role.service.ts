@@ -133,7 +133,6 @@ export class RoleService {
       const response = await lastValueFrom(
         this.roleGrpcService.GetRole({ id }),
       );
-      // console.log(response.permissionIds);
       const permissions = await this.populatePermissions(
         response.permissionIds,
       );

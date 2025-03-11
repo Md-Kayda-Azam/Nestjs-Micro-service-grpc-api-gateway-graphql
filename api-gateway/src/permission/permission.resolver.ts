@@ -14,16 +14,14 @@ import {
   GetManyPermissionsResponse,
 } from './entities/permission.entity';
 import { GraphQLError } from 'graphql';
-import { UseGuards } from '@nestjs/common';
 import { Permissions } from 'src/shared/guards/decorator/permissions.decorator';
-import { AuthGuard } from 'src/shared/guards/auth.guard';
-import { PermissionGuard } from 'src/shared/guards/permission.guard';
 
 @Resolver(() => Permission)
 export class PermissionResolver {
   constructor(private readonly permissionService: PermissionService) {}
 
   @Mutation(() => Permission)
+  @Permissions('user:manage-roles')
   async createPermission(
     @Args('createPermissionInput') createPermissionInput: CreatePermissionInput,
   ): Promise<Permission> {
@@ -43,8 +41,7 @@ export class PermissionResolver {
   }
 
   @Query(() => GetAllPermissionsOutput)
-  // @UseGuards(AuthGuard, PermissionGuard)
-  // @Permissions('user:create')
+  @Permissions('user:manage-roles')
   async getAllPermissions(
     @Args('getAllPermissionsInput')
     getAllPermissionsInput: GetAllPermissionsInput,
@@ -63,6 +60,7 @@ export class PermissionResolver {
   }
 
   @Query(() => Permission)
+  @Permissions('user:manage-roles')
   async getPermission(
     @Args('id', { type: () => String }) id: string,
   ): Promise<Permission> {
@@ -80,6 +78,7 @@ export class PermissionResolver {
   }
 
   @Mutation(() => Permission)
+  @Permissions('user:manage-roles')
   async updatePermission(
     @Args('updatePermissionInput') updatePermissionInput: UpdatePermissionInput,
   ): Promise<Permission> {
@@ -99,6 +98,7 @@ export class PermissionResolver {
   }
 
   @Mutation(() => DeletePermissionOutput)
+  @Permissions('user:manage-roles')
   async deletePermission(
     @Args('id', { type: () => String }) id: string,
   ): Promise<DeletePermissionOutput> {
@@ -116,6 +116,7 @@ export class PermissionResolver {
   }
 
   @Mutation(() => CreateManyPermissionsOutput)
+  @Permissions('user:manage-roles')
   async createManyPermissions(
     @Args('createManyPermissionsInput')
     createManyPermissionsInput: CreateManyPermissionsInput,
@@ -136,6 +137,7 @@ export class PermissionResolver {
   }
 
   @Mutation(() => DeleteManyPermissionsOutput)
+  @Permissions('user:manage-roles')
   async deleteManyPermissions(
     @Args('deleteManyPermissionsInput')
     deleteManyPermissionsInput: DeleteManyPermissionsInput,
@@ -156,6 +158,7 @@ export class PermissionResolver {
   }
 
   @Query(() => GetManyPermissionsResponse, { name: 'getManyPermissions' })
+  @Permissions('user:manage-roles')
   async getManyPermissions(
     @Args('ids', { type: () => [String] }) ids: string[],
   ): Promise<GetManyPermissionsResponse> {

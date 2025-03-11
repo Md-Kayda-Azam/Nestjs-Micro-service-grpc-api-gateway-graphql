@@ -14,14 +14,62 @@ import {
   DeleteManyPermissionsInput,
   DeleteManyPermissionsOutput,
 } from './entities/permission.entity';
+import { RoleGrpcService } from 'src/role/types/roleTypes';
+import { RedisService } from 'src/shared/guards/redis.service';
 
 @Injectable()
 export class PermissionService {
   private permissionGrpcService: PermissionGrpcService;
+  private roleGrpcService: RoleGrpcService; // এখানে RoleGrpcService যুক্ত করা হয়েছে
 
-  constructor(@Inject('PERMISSION_PACKAGE') private client: ClientGrpc) {
+  constructor(
+    @Inject('PERMISSION_PACKAGE') private permissionClient: ClientGrpc,
+    @Inject('ROLE_PACKAGE') private roleClient: ClientGrpc, // নতুন RoleClient যোগ করা হলো
+    private redisService: RedisService,
+  ) {}
+
+  onModuleInit() {
     this.permissionGrpcService =
-      this.client.getService<PermissionGrpcService>('PermissionService');
+      this.permissionClient.getService<PermissionGrpcService>(
+        'PermissionService',
+      );
+    this.roleGrpcService =
+      this.roleClient.getService<RoleGrpcService>('RoleService'); // RoleService ইনিশিয়ালাইজ করা হলো
+  }
+
+  async cacheUserPermissions(userId: string, roleId: string): Promise<void> {
+    try {
+      // `this.roleGrpcService` ব্যবহার করুন
+      const roleResponse = await lastValueFrom(
+        this.roleGrpcService.GetRole({ id: roleId }),
+      );
+      console.log(roleResponse);
+
+      const permissionIds = roleResponse.permissionIds || [];
+      if (permissionIds.length === 0) {
+        await this.redisService.setJson(`user:permissions:${userId}`, []);
+        return;
+      }
+
+      const { permissions } = await this.getManyPermissions(permissionIds);
+      const permissionNames = permissions.map((perm) => perm.name);
+
+      await this.redisService.setJson(
+        `user:permissions:${userId}`,
+        permissionNames,
+        3600,
+      );
+    } catch (error) {
+      console.error('Error caching permissions:', error);
+      throw new Error('Failed to cache permissions');
+    }
+  }
+
+  async getCachedUserPermissions(userId: string): Promise<string[]> {
+    const permissions = await this.redisService.getJson<string[]>(
+      `user:permissions:${userId}`,
+    );
+    return permissions || [];
   }
 
   async createPermission(data: CreatePermissionInput): Promise<Permission> {

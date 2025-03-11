@@ -1,23 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TeacherService } from './teacher.service';
 import { TeacherResolver } from './teacher.resolver';
-import { join } from 'path';
+import { ClientsModule } from 'src/clients.module';
 
 @Module({
-  imports: [
-    ClientsModule.register([
-      {
-        name: 'TEACHER_PACKAGE',
-        transport: Transport.GRPC,
-        options: {
-          package: 'teacher',
-          protoPath: join(__dirname, '../../../proto/teacher.proto'),
-          url: 'localhost:50057',
-        },
-      },
-    ]),
-  ],
+  imports: [ClientsModule],
   providers: [TeacherService, TeacherResolver],
   exports: [TeacherService],
 })

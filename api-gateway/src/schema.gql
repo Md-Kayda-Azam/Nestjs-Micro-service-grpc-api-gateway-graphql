@@ -2,6 +2,39 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Permission {
+  _id: String!
+  name: String!
+  description: String!
+  isActive: Boolean!
+  createdAt: String
+  updatedAt: String
+}
+
+type GetAllPermissionsOutput {
+  permissions: [Permission!]!
+  total: Int!
+}
+
+type DeletePermissionOutput {
+  success: Boolean!
+  message: String!
+}
+
+type CreateManyPermissionsOutput {
+  permissions: [Permission!]!
+}
+
+type DeleteManyPermissionsOutput {
+  success: Boolean!
+  message: String!
+}
+
+type GetManyPermissionsResponse {
+  permissions: [Permission!]!
+  total: Int!
+}
+
 type Device {
   deviceId: String!
   ipAddress: String!
@@ -39,39 +72,6 @@ type User {
   accessToken: String
   createdAt: String
   updatedAt: String
-}
-
-type Permission {
-  _id: String!
-  name: String!
-  description: String!
-  isActive: Boolean!
-  createdAt: String
-  updatedAt: String
-}
-
-type GetAllPermissionsOutput {
-  permissions: [Permission!]!
-  total: Int!
-}
-
-type DeletePermissionOutput {
-  success: Boolean!
-  message: String!
-}
-
-type CreateManyPermissionsOutput {
-  permissions: [Permission!]!
-}
-
-type DeleteManyPermissionsOutput {
-  success: Boolean!
-  message: String!
-}
-
-type GetManyPermissionsResponse {
-  permissions: [Permission!]!
-  total: Int!
 }
 
 type Role {
@@ -174,57 +174,6 @@ type DeleteManySchoolsOutput {
   message: String!
 }
 
-type Student {
-  _id: String!
-  schoolId: String!
-  dateOfBirth: String!
-  gender: String!
-  studentID: String!
-  email: String!
-  phoneNumber: String!
-  address: String!
-  admissionDate: String!
-  enrollmentDate: String!
-  classId: String!
-  enrolledCourses: [String!]!
-  grades: [GradeEntry!]
-  extracurricularActivities: [String!]!
-  parentId: String!
-  nationality: String!
-  graduationDate: String!
-  profilePictureUrl: String!
-  awards: [String!]!
-  healthDetails: String!
-  isSpecialNeeds: Boolean!
-  remarks: String!
-  createdAt: String
-  updatedAt: String
-}
-
-type GradeEntry {
-  courseId: String!
-  grade: Float!
-}
-
-type GetAllStudentsOutput {
-  students: [Student!]!
-  total: Int!
-}
-
-type DeleteStudentOutput {
-  success: Boolean!
-  message: String!
-}
-
-type CreateManyStudentsOutput {
-  students: [Student!]!
-}
-
-type DeleteManyStudentsOutput {
-  success: Boolean!
-  message: String!
-}
-
 type SocialMediaLinks {
   facebook: String
   twitter: String
@@ -308,6 +257,57 @@ type CreateManyParentsOutput {
 }
 
 type DeleteManyParentsOutput {
+  success: Boolean!
+  message: String!
+}
+
+type Student {
+  _id: String!
+  schoolId: String!
+  dateOfBirth: String!
+  gender: String!
+  studentID: String!
+  email: String!
+  phoneNumber: String!
+  address: String!
+  admissionDate: String!
+  enrollmentDate: String!
+  classId: String!
+  enrolledCourses: [String!]!
+  grades: [GradeEntry!]
+  extracurricularActivities: [String!]!
+  parentId: String!
+  nationality: String!
+  graduationDate: String!
+  profilePictureUrl: String!
+  awards: [String!]!
+  healthDetails: String!
+  isSpecialNeeds: Boolean!
+  remarks: String!
+  createdAt: String
+  updatedAt: String
+}
+
+type GradeEntry {
+  courseId: String!
+  grade: Float!
+}
+
+type GetAllStudentsOutput {
+  students: [Student!]!
+  total: Int!
+}
+
+type DeleteStudentOutput {
+  success: Boolean!
+  message: String!
+}
+
+type CreateManyStudentsOutput {
+  students: [Student!]!
+}
+
+type DeleteManyStudentsOutput {
   success: Boolean!
   message: String!
 }

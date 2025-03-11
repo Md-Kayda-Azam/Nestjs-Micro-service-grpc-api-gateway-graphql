@@ -35,6 +35,7 @@
     "dotenv": "^16.4.7",
     "graphql": "^16.10.0",
     "graphql-tools": "^9.0.16",
+    "ioredis": "^5.6.0",
     "jsonwebtoken": "^9.0.2",
     "redis": "^4.7.0",
     "reflect-metadata": "^0.2.2",

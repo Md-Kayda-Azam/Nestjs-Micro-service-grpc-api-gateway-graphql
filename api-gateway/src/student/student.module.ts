@@ -1,24 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-
-import { join } from 'path';
 import { StudentResolver } from './student.resolver';
 import { StudentService } from './student.service';
+import { SharedModule } from 'src/shared/guards/shared.module';
+import { ClientsModule } from 'src/clients.module';
 
 @Module({
-  imports: [
-    ClientsModule.register([
-      {
-        name: 'STUDENT_PACKAGE',
-        transport: Transport.GRPC,
-        options: {
-          package: 'student',
-          protoPath: join(__dirname, '../../../proto/student.proto'),
-          url: 'localhost:50056',
-        },
-      },
-    ]),
-  ],
+  imports: [SharedModule, ClientsModule],
   providers: [StudentResolver, StudentService],
   exports: [StudentService],
 })

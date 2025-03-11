@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Device, User, UserDocument } from '../schema/user.schema';
+import { Device, User, UserDocument } from './schema/user.schema';
 import { Model } from 'mongoose';
 import * as grpc from '@grpc/grpc-js';
 import { RpcException } from '@nestjs/microservices';
-import { HashPassword } from '../utils/VerificationPassword'; // ধরে নিচ্ছি এটা আছে
+import { HashPassword } from './utils/VerificationPassword'; // ধরে নিচ্ছি এটা আছে
 import { randomBytes } from 'crypto';
-import { checkRateLimit } from '../helper/checkRateLimit';
+import { checkRateLimit } from './helper/checkRateLimit';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import {
@@ -17,25 +17,18 @@ import {
   RequestPasswordResetData,
   ResetPasswordData,
   VerifyAccountData,
-} from '../types/authTypes';
+} from './types/authTypes';
 import {
   sendResetEmail,
   sendSecurityAlertEmail,
   sendVerificationEmail,
-} from '../utils/VerificationEmail';
-import { IpAddressGet } from '../api/IpAddressGet';
-import { generateDeviceId } from '../utils/generateDeviceId';
-import { Role, RoleDocument } from '../schema/role.schema';
-import { Permission, PermissionDocument } from '../schema/permission.schema';
+} from './utils/VerificationEmail';
+import { IpAddressGet } from './api/IpAddressGet';
+import { generateDeviceId } from './utils/generateDeviceId';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    @InjectModel(User.name) private authModel: Model<UserDocument>,
-    @InjectModel(Role.name) private roleModel: Model<RoleDocument>, // সঠিকভাবে ইনজেক্ট
-    @InjectModel(Permission.name)
-    private permissionModel: Model<PermissionDocument>, // সঠিকভাবে ইনজেক্ট
-  ) {}
+  constructor(@InjectModel(User.name) private authModel: Model<UserDocument>) {}
 
   getHello(): string {
     return 'Hello World!';
@@ -371,17 +364,6 @@ export class AuthService {
       existingDevice.location = location;
     }
 
-    const role = await this.roleModel
-      .findById(user.role)
-      .populate('permissionIds', 'name')
-      .exec();
-    if (!role) {
-      throw new RpcException({
-        code: grpc.status.NOT_FOUND,
-        message: 'Role not found for this user',
-      });
-    }
-
     // const permissions = role.permissionIds.map((p: any) => p.name);
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) throw new Error('JWT_SECRET not defined');
@@ -389,7 +371,7 @@ export class AuthService {
     const payload = {
       sub: user._id.toString(),
       schoolId: user.school.toString(),
-      roleId: role._id.toString(),
+      roleId: user._id.toString(),
       deviceId,
     };
 

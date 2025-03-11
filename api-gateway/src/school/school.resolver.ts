@@ -13,12 +13,14 @@ import {
   DeleteManySchoolsOutput,
 } from './entities/school.entity';
 import { GraphQLError } from 'graphql';
+import { Permissions } from 'src/shared/guards/decorator/permissions.decorator';
 
 @Resolver(() => School)
 export class SchoolResolver {
   constructor(private readonly schoolService: SchoolService) {}
 
   @Mutation(() => School)
+  @Permissions('school:create')
   async createSchool(
     @Args('createSchoolInput') createSchoolInput: CreateSchoolInput,
   ): Promise<School> {
@@ -36,6 +38,7 @@ export class SchoolResolver {
   }
 
   @Query(() => GetAllSchoolsOutput)
+  @Permissions('school:view')
   async getAllSchools(
     @Args('getAllSchoolsInput') getAllSchoolsInput: GetAllSchoolsInput,
   ): Promise<GetAllSchoolsOutput> {
@@ -51,6 +54,7 @@ export class SchoolResolver {
   }
 
   @Query(() => School)
+  @Permissions('school:view')
   async getSchool(
     @Args('id', { type: () => String }) id: string,
   ): Promise<School> {
@@ -68,6 +72,7 @@ export class SchoolResolver {
   }
 
   @Mutation(() => School)
+  @Permissions('school:update')
   async updateSchool(
     @Args('updateSchoolInput') updateSchoolInput: UpdateSchoolInput,
   ): Promise<School> {
@@ -85,6 +90,7 @@ export class SchoolResolver {
   }
 
   @Mutation(() => DeleteSchoolOutput)
+  @Permissions('school:delete')
   async deleteSchool(
     @Args('id', { type: () => String }) id: string,
   ): Promise<DeleteSchoolOutput> {
@@ -102,6 +108,7 @@ export class SchoolResolver {
   }
 
   @Mutation(() => CreateManySchoolsOutput)
+  @Permissions('school:create')
   async createManySchools(
     @Args('createManySchoolsInput')
     createManySchoolsInput: CreateManySchoolsInput,
@@ -120,6 +127,7 @@ export class SchoolResolver {
   }
 
   @Mutation(() => DeleteManySchoolsOutput)
+  @Permissions('school:delete')
   async deleteManySchools(
     @Args('deleteManySchoolsInput')
     deleteManySchoolsInput: DeleteManySchoolsInput,
