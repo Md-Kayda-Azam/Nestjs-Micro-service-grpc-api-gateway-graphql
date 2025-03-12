@@ -16,9 +16,6 @@ export class Role {
   @Field(() => String)
   name: string;
 
-  // @Field(() => [String])
-  // permissionIds: string[];
-
   @Field(() => [Permission])
   permissions: Permission[];
 

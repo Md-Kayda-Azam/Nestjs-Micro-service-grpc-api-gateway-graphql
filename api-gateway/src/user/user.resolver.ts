@@ -4,6 +4,7 @@ import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input'; // New DTO for update
 import { UserService } from './user.service';
 import { User } from 'src/shared/schema/user.entity';
+import { Permissions } from '../shared/guards/decorator/permissions.decorator';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -14,6 +15,7 @@ export class UserResolver {
    * @returns
    */
   @Query(() => [User], { name: 'users' })
+  @Permissions('user:view')
   async findAll(): Promise<User[]> {
     try {
       return await this.userService.findAllUsers();
@@ -27,6 +29,7 @@ export class UserResolver {
   }
 
   @Query(() => User, { name: 'user' })
+  @Permissions('user:view')
   async findOne(@Args('email') email: string): Promise<User> {
     try {
       const user = await this.userService.findUser(email);
@@ -44,6 +47,7 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
+  @Permissions('user:create')
   async createUser(
     @Args('input', { type: () => CreateUserInput })
     input: CreateUserInput,
@@ -63,6 +67,7 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
+  @Permissions('user:update')
   async updateUser(
     @Args('input', { type: () => UpdateUserInput })
     input: UpdateUserInput,
@@ -85,6 +90,7 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
+  @Permissions('user:delete')
   async deleteUser(@Args('id') id: string): Promise<boolean> {
     try {
       await this.userService.deleteUser(id);

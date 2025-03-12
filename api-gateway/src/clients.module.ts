@@ -81,6 +81,15 @@ import { join } from 'path';
           url: 'localhost:50058',
         },
       },
+      {
+        name: 'PAYMENT_PACKAGE',
+        transport: Transport.GRPC,
+        options: {
+          package: 'payment',
+          protoPath: join(__dirname, '../../proto/payment.proto'),
+          url: 'localhost:50059',
+        },
+      },
     ]),
   ],
   exports: [NestClientsModule],

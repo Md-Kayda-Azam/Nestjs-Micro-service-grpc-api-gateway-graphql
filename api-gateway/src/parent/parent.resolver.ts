@@ -20,7 +20,7 @@ export class ParentResolver {
   constructor(private readonly parentService: ParentService) {}
 
   @Mutation(() => Parent)
-  @Permissions('user:create')
+  @Permissions('parent:create')
   async createParent(
     @Args('createParentInput') createParentInput: CreateParentInput,
   ): Promise<Parent> {
@@ -38,6 +38,7 @@ export class ParentResolver {
   }
 
   @Query(() => GetAllParentsOutput)
+  @Permissions('parent:view')
   async getAllParents(
     @Args('getAllParentsInput') getAllParentsInput: GetAllParentsInput,
   ): Promise<GetAllParentsOutput> {
@@ -53,6 +54,7 @@ export class ParentResolver {
   }
 
   @Query(() => Parent)
+  @Permissions('parent:view')
   async getParent(
     @Args('id', { type: () => String }) id: string,
   ): Promise<Parent> {
@@ -70,6 +72,7 @@ export class ParentResolver {
   }
 
   @Mutation(() => Parent)
+  @Permissions('parent:update')
   async updateParent(
     @Args('updateParentInput') updateParentInput: UpdateParentInput,
   ): Promise<Parent> {
@@ -87,6 +90,7 @@ export class ParentResolver {
   }
 
   @Mutation(() => DeleteParentOutput)
+  @Permissions('parent:delete')
   async deleteParent(
     @Args('id', { type: () => String }) id: string,
   ): Promise<DeleteParentOutput> {
@@ -104,6 +108,7 @@ export class ParentResolver {
   }
 
   @Mutation(() => CreateManyParentsOutput)
+  @Permissions('parent:create')
   async createManyParents(
     @Args('createManyParentsInput')
     createManyParentsInput: CreateManyParentsInput,
@@ -122,6 +127,7 @@ export class ParentResolver {
   }
 
   @Mutation(() => DeleteManyParentsOutput)
+  @Permissions('parent:delete')
   async deleteManyParents(
     @Args('deleteManyParentsInput')
     deleteManyParentsInput: DeleteManyParentsInput,

@@ -5,14 +5,6 @@ export interface GrpcRoleResponse {
   id: string;
   name: string;
   permissionIds: string[];
-  // permissionIds: {
-  //   id: string;
-  //   name: string;
-  //   description: string;
-  //   isActive: string;
-  //   createdAt?: string;
-  //   updatedAt?: string;
-  // };
   description: string;
   isActive: boolean;
   createdAt?: string;

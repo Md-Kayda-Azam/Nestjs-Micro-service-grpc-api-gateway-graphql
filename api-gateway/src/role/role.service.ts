@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { RoleGrpcService } from './types/roleTypes';
-// import { PermissionService } from '../permission/permission.service'; // PermissionService import করো
 import {
   Role,
   CreateRoleInput,

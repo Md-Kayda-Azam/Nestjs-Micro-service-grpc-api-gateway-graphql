@@ -13,12 +13,14 @@ import {
   DeleteManyTeachersOutput,
 } from './entities/teacher.entity';
 import { GraphQLError } from 'graphql';
+import { Permissions } from 'src/shared/guards/decorator/permissions.decorator';
 
 @Resolver(() => Teacher)
 export class TeacherResolver {
   constructor(private readonly teacherService: TeacherService) {}
 
   @Mutation(() => Teacher)
+  @Permissions('teacher:create')
   async createTeacher(
     @Args('createTeacherInput') createTeacherInput: CreateTeacherInput,
   ): Promise<Teacher> {
@@ -36,6 +38,7 @@ export class TeacherResolver {
   }
 
   @Query(() => GetAllTeachersOutput)
+  @Permissions('teacher:view')
   async getAllTeachers(
     @Args('getAllTeachersInput') getAllTeachersInput: GetAllTeachersInput,
   ): Promise<GetAllTeachersOutput> {
@@ -51,6 +54,7 @@ export class TeacherResolver {
   }
 
   @Query(() => Teacher)
+  @Permissions('teacher:view')
   async getTeacher(
     @Args('id', { type: () => String }) id: string,
   ): Promise<Teacher> {
@@ -68,6 +72,7 @@ export class TeacherResolver {
   }
 
   @Mutation(() => Teacher)
+  @Permissions('teacher:update')
   async updateTeacher(
     @Args('updateTeacherInput') updateTeacherInput: UpdateTeacherInput,
   ): Promise<Teacher> {
@@ -85,6 +90,7 @@ export class TeacherResolver {
   }
 
   @Mutation(() => DeleteTeacherOutput)
+  @Permissions('teacher:delete')
   async deleteTeacher(
     @Args('id', { type: () => String }) id: string,
   ): Promise<DeleteTeacherOutput> {
@@ -102,6 +108,7 @@ export class TeacherResolver {
   }
 
   @Mutation(() => CreateManyTeachersOutput)
+  @Permissions('teacher:create')
   async createManyTeachers(
     @Args('createManyTeachersInput')
     createManyTeachersInput: CreateManyTeachersInput,
@@ -122,6 +129,7 @@ export class TeacherResolver {
   }
 
   @Mutation(() => DeleteManyTeachersOutput)
+  @Permissions('teacher:delete')
   async deleteManyTeachers(
     @Args('deleteManyTeachersInput')
     deleteManyTeachersInput: DeleteManyTeachersInput,

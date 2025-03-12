@@ -312,6 +312,35 @@ type DeleteManyStudentsOutput {
   message: String!
 }
 
+type Payment {
+  _id: String!
+  userId: String
+  amount: Float
+  paymentType: String
+  dueAmount: Float
+  lastDueDate: DateTime
+  paymentDate: DateTime
+  paymentStatus: String
+  paymentMethod: String
+  transactionId: String
+  paymentGateway: String
+  reminderSentDates: [String!]
+  lateFee: Float
+  remarks: String
+  createdAt: String
+  updatedAt: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type GetPaymentHistoryOutput {
+  payments: [Payment!]!
+  message: String!
+}
+
 input SocialMediaLinkInput {
   platform: String!
   url: String!
@@ -334,6 +363,7 @@ type Query {
   getTeacher(id: String!): Teacher!
   getAllParents(getAllParentsInput: GetAllParentsInput!): GetAllParentsOutput!
   getParent(id: String!): Parent!
+  getPaymentHistory(getPaymentHistoryInput: GetPaymentHistoryInput!): GetPaymentHistoryOutput!
 }
 
 input GetAllRolesInput {
@@ -368,6 +398,14 @@ input GetAllParentsInput {
   schoolId: String!
   limit: Int!
   offset: Int!
+}
+
+input GetPaymentHistoryInput {
+  userId: String!
+  paymentType: String
+  paymentStatus: String
+  startDate: DateTime
+  endDate: DateTime
 }
 
 type Mutation {
@@ -408,6 +446,8 @@ type Mutation {
   deleteParent(id: String!): DeleteParentOutput!
   createManyParents(createManyParentsInput: CreateManyParentsInput!): CreateManyParentsOutput!
   deleteManyParents(deleteManyParentsInput: DeleteManyParentsInput!): DeleteManyParentsOutput!
+  createPayment(createPaymentInput: CreatePaymentInput!): Payment!
+  updatePaymentStatus(updatePaymentStatusInput: UpdatePaymentStatusInput!): Payment!
 }
 
 input CreateUserInput {
@@ -720,4 +760,25 @@ input CreateManyParentsInput {
 
 input DeleteManyParentsInput {
   ids: [String!]!
+}
+
+input CreatePaymentInput {
+  userId: String!
+  amount: Float!
+  paymentType: String!
+  dueAmount: Float
+  lastDueDate: DateTime
+  paymentDate: DateTime
+  paymentMethod: String
+  paymentGateway: String
+  lateFee: Float
+  remarks: String
+}
+
+input UpdatePaymentStatusInput {
+  _id: String!
+  paymentStatus: String!
+  transactionId: String
+  paymentGateway: String
+  paymentDate: DateTime
 }

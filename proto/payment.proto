@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package payment;
+
+// Payment সার্ভিস ডিফাইন করা
+service PaymentService {
+  // নতুন পেমেন্ট এন্ট্রি তৈরি
+  rpc CreatePayment(CreatePaymentRequest) returns (CreatePaymentResponse) {}
+
+  // পেমেন্ট স্ট্যাটাস আপডেট
+  rpc UpdatePaymentStatus(UpdatePaymentStatusRequest) returns (UpdatePaymentStatusResponse) {}
+
+  // পেমেন্ট হিস্টোরি দেখা
+  rpc GetPaymentHistory(GetPaymentHistoryRequest) returns (GetPaymentHistoryResponse) {}
+}
+
+// CreatePaymentRequest মেসেজ
+message CreatePaymentRequest {
+  string userId = 1;
+  double amount = 2;
+  string paymentType = 3;
+  double dueAmount = 4;
+  string lastDueDate = 5; // ISO 8601 format (e.g., "2023-10-01T00:00:00Z")
+  string paymentMethod = 6;
+  string paymentGateway = 7;
+  double lateFee = 8;
+  string remarks = 9;
+  string paymentDate = 10; 
+}
+
+// CreatePaymentResponse মেসেজ
+message CreatePaymentResponse {
+  string id = 1;
+  string userId = 2;
+  double amount = 3;
+  string paymentType = 4;
+  string paymentStatus = 5;
+  string message = 6;
+}
+
+// UpdatePaymentStatusRequest মেসেজ
+message UpdatePaymentStatusRequest {
+  string id = 1;
+  string paymentStatus = 2;
+  string transactionId = 3;
+  string paymentGateway = 4;
+  string paymentDate = 5; // ISO 8601 format
+}
+
+// UpdatePaymentStatusResponse মেসেজ
+message UpdatePaymentStatusResponse {
+  string id = 1;
+  string paymentStatus = 2;
+  string message = 3;
+}
+
+// GetPaymentHistoryRequest মেসেজ
+message GetPaymentHistoryRequest {
+  string userId = 1;
+  string paymentType = 2; // Optional filter
+  string paymentStatus = 3; // Optional filter
+  string startDate = 4; // Optional, ISO 8601 format
+  string endDate = 5; // Optional, ISO 8601 format
+}
+
+// Payment মেসেজ (হিস্টোরির জন্য)
+message Payment {
+  string id = 1;
+  string userId = 2;
+  double amount = 3;
+  string paymentType = 4;
+  double dueAmount = 5;
+  string lastDueDate = 6;
+  string paymentStatus = 7;
+  string paymentMethod = 8;
+  string transactionId = 9;
+  string paymentGateway = 10;
+  repeated string reminderSentDates = 11;
+  string paymentDate = 12;
+  double lateFee = 13;
+  string remarks = 14;
+  string createdAt = 15;
+  string updatedAt = 16;
+}
+
+// GetPaymentHistoryResponse মেসেজ
+message GetPaymentHistoryResponse {
+  repeated Payment payments = 1;
+  string message = 2;
+}

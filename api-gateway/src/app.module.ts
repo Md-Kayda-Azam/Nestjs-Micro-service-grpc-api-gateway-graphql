@@ -1,5 +1,4 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-// import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { APP_PIPE, APP_GUARD, APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -21,6 +20,7 @@ import { StudentModule } from './student/student.module';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { PermissionGuard } from './shared/guards/permission.guard';
 import { ClientsModule } from './clients.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -30,80 +30,6 @@ import { ClientsModule } from './clients.module';
       playground: true,
       context: ({ req }) => ({ req }),
     }),
-    // ClientsModule.register([
-    //   {
-    //     name: 'USER_PACKAGE',
-    //     transport: Transport.GRPC,
-    //     options: {
-    //       package: 'user',
-    //       protoPath: join(__dirname, '../../proto/user.proto'),
-    //       url: 'localhost:50051',
-    //     },
-    //   },
-    //   {
-    //     name: 'AUTH_PACKAGE',
-    //     transport: Transport.GRPC,
-    //     options: {
-    //       package: 'auth',
-    //       protoPath: join(__dirname, '../../proto/auth.proto'),
-    //       url: 'localhost:50052',
-    //     },
-    //   },
-    //   {
-    //     name: 'PERMISSION_PACKAGE',
-    //     transport: Transport.GRPC,
-    //     options: {
-    //       package: 'permission',
-    //       protoPath: join(__dirname, '../../proto/permission.proto'),
-    //       url: 'localhost:50052',
-    //     },
-    //   },
-    //   {
-    //     name: 'ROLE_PACKAGE',
-    //     transport: Transport.GRPC,
-    //     options: {
-    //       package: 'role',
-    //       protoPath: join(__dirname, '../../proto/role.proto'),
-    //       url: 'localhost:50052',
-    //     },
-    //   },
-    //   {
-    //     name: 'SCHOOL_PACKAGE',
-    //     transport: Transport.GRPC,
-    //     options: {
-    //       package: 'school',
-    //       protoPath: join(__dirname, '../../proto/school.proto'),
-    //       url: 'localhost:50055',
-    //     },
-    //   },
-    //   {
-    //     name: 'STUDENT_PACKAGE',
-    //     transport: Transport.GRPC,
-    //     options: {
-    //       package: 'student',
-    //       protoPath: join(__dirname, '../../proto/student.proto'),
-    //       url: 'localhost:50056',
-    //     },
-    //   },
-    //   {
-    //     name: 'TEACHER_PACKAGE',
-    //     transport: Transport.GRPC,
-    //     options: {
-    //       package: 'teacher',
-    //       protoPath: join(__dirname, '../../proto/teacher.proto'),
-    //       url: 'localhost:50057',
-    //     },
-    //   },
-    //   {
-    //     name: 'PARENT_PACKAGE',
-    //     transport: Transport.GRPC,
-    //     options: {
-    //       package: 'parent',
-    //       protoPath: join(__dirname, '../../proto/parent.proto'),
-    //       url: 'localhost:50058',
-    //     },
-    //   },
-    // ]),
     ClientsModule,
     UserModule,
     AuthModule,
@@ -114,6 +40,7 @@ import { ClientsModule } from './clients.module';
     TeacherModule,
     ParentModule,
     SharedModule,
+    PaymentModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: GlobalGuard },
